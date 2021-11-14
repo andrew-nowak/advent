@@ -14,14 +14,21 @@ trait Support {
   def loadStringSeq: Seq[String] = loadStringSeq("\\r?\\n")
 
   def loadIntSeq(delimiter: String = "\\r?\\n"): Seq[Int] =
-    load.split(delimiter).filter {
-      _ != ""
-    }.map(_.toInt)
+    load
+      .split(delimiter)
+      .filter(_ != "")
+      .map(_.toInt)
 
   def loadIntSeq: Seq[Int] = loadIntSeq()
 
-  def load2dIntSeq(delimiterA: String = "\\r?\\n", delimiterB: String = " "): Seq[Seq[Int]] =
-    load.split(delimiterA).filter(_ != "").map(_.split(delimiterB).map(_.toInt).toSeq)
+  def load2dIntSeq(
+      delimiterA: String = "\\r?\\n",
+      delimiterB: String = " "
+  ): Seq[Seq[Int]] =
+    load
+      .split(delimiterA)
+      .filter(_ != "")
+      .map(_.split(delimiterB).map(_.toInt).toSeq)
 
   def load2dIntSeq: Seq[Seq[Int]] = load2dIntSeq()
 }

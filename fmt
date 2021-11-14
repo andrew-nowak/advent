@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -x 
+
+mill mill.scalalib.scalafmt.ScalafmtModule/reformatAll __.sources

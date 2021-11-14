@@ -10,7 +10,8 @@ object Main extends App with Support {
 
   println(input.map(calculateFuel).sum)
 
-  def calculateFuelFuel(mass: Int): Int = LazyList.iterate(calculateFuel(mass))(calculateFuel).takeWhile(_ > 0).sum
+  def calculateFuelFuel(mass: Int): Int =
+    LazyList.iterate(calculateFuel(mass))(calculateFuel).takeWhile(_ > 0).sum
 
   println(input.map(calculateFuelFuel).sum)
 }
