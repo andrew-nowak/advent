@@ -23,12 +23,12 @@ fi
 LOC="$YEAR"/"$DAY"/src/"$YEAR"/"$DAY"
 
 mkdir -p "$LOC"
-> "$LOC"/Main.scala cat <<EOF
+> "$LOC"/"${DAY^}".scala cat <<EOF
 package $YEAR.$DAY
 
 import lib.Support
 
-object Main extends App with Support {
+object ${DAY^} extends App with Support {
   println(load)
 }
 EOF
