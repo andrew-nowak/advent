@@ -2,7 +2,7 @@ package nineteen.one
 
 import lib.Support
 
-object Main extends App with Support {
+object One extends App with Support {
 
   def calculateFuel(mass: Int): Int = (mass / 3) - 2
 

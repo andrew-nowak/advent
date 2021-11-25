@@ -3,10 +3,10 @@ package nineteen.two
 import lib.Intcode
 import lib.Support
 
-object Main extends App with Support {
+object Two extends App with Support {
   val in = loadIntSeq(",")
 
-  val part1 = Intcode.buildAndRunWithInputs(in, 12, 2)
+  val part1 = Intcode.buildAndRunWithPhrase(in, 12, 2)
 
   println(part1.memory.head)
 
@@ -17,7 +17,7 @@ object Main extends App with Support {
 
   val part2 = phrases
     .find { case (noun, verb) =>
-      Intcode.buildAndRunWithInputs(in, noun, verb).memory.head == 19690720
+      Intcode.buildAndRunWithPhrase(in, noun, verb).memory.head == 19690720
     }
     .map { case (noun, verb) => 100 * noun + verb }
     .get

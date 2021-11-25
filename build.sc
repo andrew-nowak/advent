@@ -15,4 +15,5 @@ object nineteen extends ScalaModule with Common {
   object two extends ScalaModule with Common
   object three extends ScalaModule with Common
   object four extends ScalaModule with Common
+  object five extends ScalaModule with Common
 }
