@@ -17,23 +17,22 @@ object Three extends App with Support {
 
   def wire(path: Seq[String]): Map[Coord, Int] = {
     path
-      .foldLeft(State(seen = Map(origin -> 0), last = origin, n = 0)) {
-        (state, inst) =>
-          val dir = inst.head
-          val dist = inst.tail.toInt
-          val travelled: Seq[(Coord, Int)] = (1 to dist).map(d =>
-            (dir match {
-              case 'U' => state.last.up(d)
-              case 'D' => state.last.down(d)
-              case 'L' => state.last.left(d)
-              case 'R' => state.last.right(d)
-            }) -> (state.n + d)
-          )
-          State(
-            seen = state.seen ++ travelled.toMap,
-            last = travelled.last._1,
-            n = state.n + dist
-          )
+      .foldLeft(State(seen = Map(origin -> 0), last = origin, n = 0)) { (state, inst) =>
+        val dir = inst.head
+        val dist = inst.tail.toInt
+        val travelled: Seq[(Coord, Int)] = (1 to dist).map(d =>
+          (dir match {
+            case 'U' => state.last.up(d)
+            case 'D' => state.last.down(d)
+            case 'L' => state.last.left(d)
+            case 'R' => state.last.right(d)
+          }) -> (state.n + d)
+        )
+        State(
+          seen = state.seen ++ travelled.toMap,
+          last = travelled.last._1,
+          n = state.n + dist
+        )
       }
       .seen
   }

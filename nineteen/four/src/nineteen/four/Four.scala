@@ -10,9 +10,7 @@ object Four extends App with Support {
   def part1(range: Seq[Int]): Int = {
     range.count { n =>
       val pairs = n.toString.sliding(2).toSeq
-      pairs.forall(pair => pair.head <= pair.last) && pairs.exists(pair =>
-        pair.head == pair.last
-      )
+      pairs.forall(pair => pair.head <= pair.last) && pairs.exists(pair => pair.head == pair.last)
     }
   }
 
@@ -25,9 +23,7 @@ object Four extends App with Support {
       pairs.forall(pair => pair.head <= pair.last) && (
         (start.head == start(1) && start(1) != start(2)) ||
           (end.head != end(1) && end(1) == end.last) ||
-          quads.exists(quad =>
-            quad.head != quad(1) && quad(1) == quad(2) && quad(2) != quad(3)
-          )
+          quads.exists(quad => quad.head != quad(1) && quad(1) == quad(2) && quad(2) != quad(3))
       )
     }
   }

@@ -70,18 +70,14 @@ case class Intcode(
     val cond = resolve(opcode, 1)
     val dest = resolve(opcode, 2)
 
-    this.copy(instructionPointer =
-      if (cond != 0) dest else instructionPointer + 3
-    )
+    this.copy(instructionPointer = if (cond != 0) dest else instructionPointer + 3)
   }
 
   def jumpIfFalse(opcode: Int): Intcode = {
     val cond = resolve(opcode, 1)
     val dest = resolve(opcode, 2)
 
-    this.copy(instructionPointer =
-      if (cond == 0) dest else instructionPointer + 3
-    )
+    this.copy(instructionPointer = if (cond == 0) dest else instructionPointer + 3)
   }
 
   def lessThan(opcode: Int): Intcode = {
