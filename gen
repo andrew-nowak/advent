@@ -8,7 +8,7 @@ if [[ -z "$1" ]]; then
 fi
 
 if [[ -z "$2" ]]; then
-  YEAR=nineteen
+  YEAR=twentyone
   DAY="$1"
 else
   YEAR="$1"
