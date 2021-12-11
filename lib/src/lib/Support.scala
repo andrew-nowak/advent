@@ -31,4 +31,9 @@ trait Support {
       .map(_.split(delimiterB).map(_.toInt).toSeq)
 
   def load2dIntSeq: Seq[Seq[Int]] = load2dIntSeq()
+
+  def load2dIntSeqWithCoords(delimiterA: String = "\\r?\\n", delimiterB: String = " "): Map[Coord, Int] =
+    load2dIntSeq(delimiterA, delimiterB).zipWithIndex.flatMap { case (row, y) =>
+      row.zipWithIndex.map { case (i, x) => Coord(x, y) -> i }
+    }.toMap
 }
