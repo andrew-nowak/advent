@@ -9,7 +9,7 @@ trait Support {
   def load: String = loadDirty.trim
 
   def loadStringSeq(delimiter: String): Seq[String] =
-    load.split(delimiter).filter(_ != "")
+    load.split(delimiter)
 
   def loadStringSeq: Seq[String] = loadStringSeq("\\r?\\n")
 
