@@ -14,4 +14,8 @@ case class Coord(x: Int, y: Int) {
   } yield Coord(nx, ny)
 
   def manhattan(to: Coord): Int = (x - to.x).abs + (y - to.y).abs
+
+  def inBounds: Boolean = x >= 0 && y >= 0
+
+  def inBounds(max: Coord): Boolean = inBounds && x <= max.y && y <= max.y
 }
