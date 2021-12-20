@@ -10,6 +10,12 @@ trait Common extends ScalaModule with ScalafmtModule {
   override def moduleDeps: Seq[JavaModule] = Seq(lib)
 }
 
+trait Json extends ScalaModule {
+  def ivyDeps = Agg(
+    ivy"com.typesafe.play::play-json:2.9.2",
+  )
+}
+
 object nineteen extends ScalaModule with Common {
   object one extends ScalaModule with Common
   object two extends ScalaModule with Common
@@ -37,4 +43,5 @@ object twentyone extends ScalaModule with Common {
   object fifteen extends ScalaModule with Common
   object sixteen extends ScalaModule with Common
   object seventeen extends ScalaModule with Common
+  object eighteen extends ScalaModule with Common with Json
 }
