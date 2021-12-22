@@ -27,3 +27,5 @@ case class Coord(x: Int, y: Int) {
 
   def inBounds(max: Coord): Boolean = inBounds && x <= max.y && y <= max.y
 }
+
+case class Coord3d(x: Int, y: Int, z: Int)
