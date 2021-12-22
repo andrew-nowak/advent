@@ -8,9 +8,17 @@ case class Coord(x: Int, y: Int) {
     Coord(x, y + 1)
   )
 
-  def neighbours: Seq[Coord] = for {
+  /** Neighbours not including self
+    * @return
+    */
+  def neighbours: Seq[Coord] = surrounding.filter(coord => x != coord.x || y != coord.y)
+
+  /** Includes self, ordered from top left to bottom right, travelling horizontally
+    * @return
+    */
+  def surrounding: Seq[Coord] = for {
+    ny <- (y - 1) to (y + 1)
     nx <- (x - 1) to (x + 1)
-    ny <- (y - 1) to (y + 1) if x != nx || y != ny
   } yield Coord(nx, ny)
 
   def manhattan(to: Coord): Int = (x - to.x).abs + (y - to.y).abs
