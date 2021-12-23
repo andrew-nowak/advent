@@ -46,4 +46,5 @@ object twentyone extends ScalaModule with Common {
   object eighteen extends ScalaModule with Common with Json
   object twenty extends ScalaModule with Common
   object twentytwo extends ScalaModule with Common
+  object twentythree extends ScalaModule with Common
 }
