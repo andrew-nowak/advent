@@ -1,11 +1,11 @@
 import mill._, scalalib._, scalafmt._
 
 object lib extends ScalaModule {
-  def scalaVersion = "2.13.7"
+  def scalaVersion = "2.13.10"
 }
 
 trait Common extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "2.13.7"
+  def scalaVersion = "2.13.10"
 
   override def moduleDeps: Seq[JavaModule] = Seq(lib)
 }
@@ -47,4 +47,8 @@ object twentyone extends ScalaModule with Common {
   object twenty extends ScalaModule with Common
   object twentytwo extends ScalaModule with Common
   object twentythree extends ScalaModule with Common
+}
+
+object twentytwo extends ScalaModule with Common {
+  object one extends ScalaModule with Common
 }

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -x
 
@@ -8,7 +8,7 @@ if [[ -z "$1" ]]; then
 fi
 
 if [[ -z "$2" ]]; then
-  YEAR=twentyone
+  YEAR=twentytwo
   DAY="$1"
 else
   YEAR="$1"
@@ -40,7 +40,7 @@ mkdir -p "$YEAR"/"$DAY"/resources
 hello world
 EOF
 
-awk -i inplace -v x="  object $DAY extends ScalaModule with Common" "/object[[:space:]]+$YEAR"'([[:space:]]|[[:alnum:]])+\{/{f=1} !/}/{print} /}/{if (f) print x; print "}"; f=0}' build.sc
+gawk -i inplace -v x="  object $DAY extends ScalaModule with Common" "/object[[:space:]]+$YEAR"'([[:space:]]|[[:alnum:]])+\{/{f=1} !/}/{print} /}/{if (f) print x; print "}"; f=0}' build.sc
 
 ./idea
 
