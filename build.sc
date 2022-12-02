@@ -2,10 +2,14 @@ import mill._, scalalib._, scalafmt._
 
 object lib extends ScalaModule {
   def scalaVersion = "2.13.8"
+
+  def scalacOptions = Seq("-deprecation")
 }
 
 trait Common extends ScalaModule with ScalafmtModule {
   def scalaVersion = "2.13.8"
+
+  def scalacOptions = Seq("-deprecation")
 
   override def moduleDeps: Seq[JavaModule] = Seq(lib)
 }

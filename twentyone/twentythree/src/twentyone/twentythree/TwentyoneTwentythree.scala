@@ -59,8 +59,8 @@ final case class State(
     roomDepth: Int = 2
 ) {
   def repr: String = s"h: ${hallway.map(_.repr).mkString} a: ${roomA.map(_.repr).mkString} b: ${roomB
-    .map(_.repr)
-    .mkString} c: ${roomC.map(_.repr).mkString} d: ${roomD.map(_.repr).mkString}"
+      .map(_.repr)
+      .mkString} c: ${roomC.map(_.repr).mkString} d: ${roomD.map(_.repr).mkString}"
   def isComplete: Boolean =
     hallway.forall(_ == Empty) && roomA.forall(_ == Amber) && roomB.forall(_ == Bronze) && roomC.forall(
       _ == Copper
