@@ -2,7 +2,7 @@ package twentytwo.two
 
 import lib.Support
 
-object TwentytwoTwo extends App with Support:
+object TwentytwoTwo extends App with Support {
 
   def playRoundP1(r: (Char, Char)): Int = {
     val shapeScore = r._2 - 'X' + 1
@@ -13,14 +13,15 @@ object TwentytwoTwo extends App with Support:
     }
     shapeScore + winScore
   }
+
   def playRoundP2(r: (Char, Char)): Int = {
     val winScore = (r._2 - 'X') * 3
-    val shapeScore = r match  {
+    val shapeScore = r match {
       case ('A', 'Z') | ('B', 'Y') | ('C', 'X') => 2 // paper
       case ('A', 'Y') | ('B', 'X') | ('C', 'Z') => 1 // rock
       case _                                    => 3 // scissors
     }
-    
+
     winScore + shapeScore
   }
 
@@ -31,3 +32,4 @@ object TwentytwoTwo extends App with Support:
 
   val p2 = i.map(playRoundP2).sum
   println(p2)
+}
