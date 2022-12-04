@@ -17,17 +17,22 @@ object NineteenEight extends App with Support {
     val p1 = min0Layer.count(_ == 1) * min0Layer.count(_ == 2)
     println(p1)
 
-    val img = in.grouped(dims._1 * dims._2).reduce[Seq[Int]] {
-      case (layera, layerb) => layera.zip(layerb).map {
+    val img = in.grouped(dims._1 * dims._2).reduce[Seq[Int]] { case (layera, layerb) =>
+      layera.zip(layerb).map {
         case (2, pxb) => pxb
         case (pxa, _) => pxa
       }
     }
-    img.grouped(dims._1).map(row => row.map {
-      case 0 => ' '
-      case 1 => '#'
-      case x => throw new IllegalArgumentException(s"noo $x")
-    }.mkString).foreach(println)
+    img
+      .grouped(dims._1)
+      .map(row =>
+        row.map {
+          case 0 => ' '
+          case 1 => '#'
+          case x => throw new IllegalArgumentException(s"noo $x")
+        }.mkString
+      )
+      .foreach(println)
   }
 
   println("--- testdata ---")
