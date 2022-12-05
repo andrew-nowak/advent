@@ -12,9 +12,9 @@ object NineteenSeven extends App with Support {
   val input = load
 
   def run(data: String) = {
-    val in = intSeq(data, ",")
+    val in = longSeq(data, ",")
 
-    def runIntcode(seq: Seq[Int]): Int = {
+    def runIntcode(seq: Seq[Long]): Long = {
       import scala.concurrent.ExecutionContext.Implicits.global
       val buffers = seq.map { n =>
         val x = new IntcodeBuffer
@@ -31,7 +31,7 @@ object NineteenSeven extends App with Support {
       res
     }
 
-    def runLooped(seq: Seq[Int]): Int = {
+    def runLooped(seq: Seq[Long]): Long = {
       import scala.concurrent.ExecutionContext.Implicits.global
       val buffers = seq.map { n =>
         val x = new IntcodeBuffer
@@ -47,10 +47,10 @@ object NineteenSeven extends App with Support {
       Await.result(Future.sequence(intcodes).flatMap(_.last.asInstanceOf[IntcodeBuffer].take), 2.seconds)
     }
 
-    val p1 = (0 to 4).permutations.map(runIntcode).max
+    val p1 = (0L to 4L).permutations.map(runIntcode).max
     println(p1)
 
-    val p2 = (5 to 9).permutations.map(runLooped).max
+    val p2 = (5L to 9L).permutations.map(runLooped).max
     println(p2)
   }
 

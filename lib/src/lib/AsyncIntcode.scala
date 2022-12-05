@@ -4,28 +4,32 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 // TODO type param on receiver
 case class AsyncIntcode(
-    memory: Seq[Int],
-    instructionPointer: Int,
+    memory: Map[Long, Long],
+    instructionPointer: Long,
     input: Provider = Provider.nop,
-    output: Receiver = Receiver.nop
+    output: Receiver = Receiver.nop,
+    relativeBase: Long = 0,
 )(implicit val executionContext: ExecutionContext) {
-  private def getMode(opcode: Int, position: Int): Int =
-    (opcode / pow10(position + 1)) & 1
-  private def resolve(opcode: Int, position: Int, writing: Boolean = false) = {
+  def memoryAccess(n: Long): Long = memory.getOrElse(n, 0)
+  private def getMode(opcode: Long, position: Long): Long =
+    (opcode / pow10(position + 1)) % 10
+  private def resolve(opcode: Long, position: Int, writing: Boolean = false) = {
     val mode = getMode(opcode, position)
     require(
-      !writing || mode == 0,
+      !writing || mode != 1,
       s"In opcode $opcode, arg in position $position must be position mode, but got immediate mode"
     )
     mode match {
-      case 0 if writing => memory(instructionPointer + position)
-      case 0            => memory(memory(instructionPointer + position))
-      case 1            => memory(instructionPointer + position)
+      case 0 if writing => memoryAccess(instructionPointer + position)
+      case 0            => memoryAccess(memoryAccess(instructionPointer + position))
+      case 1            => memoryAccess(instructionPointer + position)
+      case 2 if writing => relativeBase + memoryAccess(instructionPointer + position)
+      case 2 => memoryAccess(relativeBase + memoryAccess(instructionPointer + position))
     }
   }
-  private def pow10(n: Int) = Seq.fill(n)(10).product
+  private def pow10(n: Long) = Math.pow(10, n).toLong
 
-  def add(opcode: Int): AsyncIntcode = {
+  def add(opcode: Long): AsyncIntcode = {
     val inputA = resolve(opcode, 1)
     val inputB = resolve(opcode, 2)
     val outputLoc = resolve(opcode, 3, writing = true)
@@ -36,7 +40,7 @@ case class AsyncIntcode(
     )
   }
 
-  def mul(opcode: Int): AsyncIntcode = {
+  def mul(opcode: Long): AsyncIntcode = {
     val inputA = resolve(opcode, 1)
     val inputB = resolve(opcode, 2)
     val outputLoc = resolve(opcode, 3, writing = true)
@@ -47,7 +51,7 @@ case class AsyncIntcode(
     )
   }
 
-  def takeInput(opcode: Int): Future[AsyncIntcode] = {
+  def takeInput(opcode: Long): Future[AsyncIntcode] = {
     val writeTo = resolve(opcode, 1, writing = true)
 
     input.take.map(value => {
@@ -58,7 +62,7 @@ case class AsyncIntcode(
     })
   }
 
-  def sendOutput(opcode: Int): AsyncIntcode = {
+  def sendOutput(opcode: Long): AsyncIntcode = {
     val value = resolve(opcode, 1)
     output.give(value)
     this.copy(
@@ -66,21 +70,21 @@ case class AsyncIntcode(
     )
   }
 
-  def jumpIfTrue(opcode: Int): AsyncIntcode = {
+  def jumpIfTrue(opcode: Long): AsyncIntcode = {
     val cond = resolve(opcode, 1)
     val dest = resolve(opcode, 2)
 
     this.copy(instructionPointer = if (cond != 0) dest else instructionPointer + 3)
   }
 
-  def jumpIfFalse(opcode: Int): AsyncIntcode = {
+  def jumpIfFalse(opcode: Long): AsyncIntcode = {
     val cond = resolve(opcode, 1)
     val dest = resolve(opcode, 2)
 
     this.copy(instructionPointer = if (cond == 0) dest else instructionPointer + 3)
   }
 
-  def lessThan(opcode: Int): AsyncIntcode = {
+  def lessThan(opcode: Long): AsyncIntcode = {
     val x = resolve(opcode, 1)
     val y = resolve(opcode, 2)
     val dest = resolve(opcode, 3, writing = true)
@@ -91,7 +95,7 @@ case class AsyncIntcode(
     )
   }
 
-  def equal(opcode: Int): AsyncIntcode = {
+  def equal(opcode: Long): AsyncIntcode = {
     val x = resolve(opcode, 1)
     val y = resolve(opcode, 2)
     val dest = resolve(opcode, 3, writing = true)
@@ -101,11 +105,20 @@ case class AsyncIntcode(
       instructionPointer = instructionPointer + 4
     )
   }
+
+  def adjustRelativeBase(opcode: Long): AsyncIntcode = {
+    val t = resolve(opcode, 1)
+
+    this.copy(
+      instructionPointer = instructionPointer + 2,
+      relativeBase = relativeBase + t
+    )
+  }
 }
 
 object AsyncIntcode {
   def run(intcode: AsyncIntcode)(implicit executionContext: ExecutionContext): Future[AsyncIntcode] = {
-    val opcode = intcode.memory(intcode.instructionPointer)
+    val opcode = intcode.memoryAccess(intcode.instructionPointer)
     opcode % 100 match {
       case 99 => Future.successful(intcode)
       case 1  => run(intcode.add(opcode))
@@ -116,11 +129,15 @@ object AsyncIntcode {
       case 6  => run(intcode.jumpIfFalse(opcode))
       case 7  => run(intcode.lessThan(opcode))
       case 8  => run(intcode.equal(opcode))
+      case 9 => run(intcode.adjustRelativeBase(opcode))
     }
   }
 
+  def memoryFromSeq(memory: Seq[Long]): Map[Long, Long] =
+    memory.zipWithIndex.map { case (n, i) => (i.toLong, n) }.toMap
+
   def buildAndRun(memory: Seq[Int])(implicit executionContext: ExecutionContext): Future[AsyncIntcode] = {
-    val ic = new AsyncIntcode(memory, 0)
+    val ic = new AsyncIntcode(memoryFromSeq(memory.map(_.toLong)), 0)
     run(ic)
   }
 
@@ -129,30 +146,30 @@ object AsyncIntcode {
   ): Future[AsyncIntcode] =
     buildAndRun(memory.updated(1, noun).updated(2, verb))
 
-  def buildAndRunWithIo(memory: Seq[Int], input: List[Int])(implicit
+  def buildAndRunWithIo(memory: Seq[Long], input: List[Long])(implicit
       executionContext: ExecutionContext
-  ): Future[List[Int]] =
-    run(AsyncIntcode(memory, 0, new ListProvider(input), new ListReceiver))
+  ): Future[List[Long]] =
+    run(AsyncIntcode(memoryFromSeq(memory), 0, new ListProvider(input), new ListReceiver))
       .map(_.output.asInstanceOf[ListReceiver].output)
 
-  def buildAndRunWithBuffers(memory: Seq[Int], input: Provider, output: Receiver)(implicit
+  def buildAndRunWithBuffers(memory: Seq[Long], input: Provider, output: Receiver)(implicit
       executionContext: ExecutionContext
   ): Future[Receiver] = {
-    run(AsyncIntcode(memory, 0, input, output)).map(_.output)
+    run(AsyncIntcode(memoryFromSeq(memory), 0, input, output)).map(_.output)
   }
 }
 
 trait Provider {
-  def take: Future[Int]
+  def take: Future[Long]
 }
 object Provider {
   def nop: Provider = new Provider {
-    override def take: Future[Int] = Future.failed(new IllegalArgumentException("can't get input from a nop provider"))
+    override def take: Future[Long] = Future.failed(new IllegalArgumentException("can't get input from a nop provider"))
   }
 }
 
-class ListProvider(private var ns: List[Int]) extends Provider {
-  override def take: Future[Int] = {
+class ListProvider(private var ns: List[Long]) extends Provider {
+  override def take: Future[Long] = {
     this.synchronized {
       if (ns.nonEmpty) {
         val head :: nextNs = ns
@@ -166,38 +183,38 @@ class ListProvider(private var ns: List[Int]) extends Provider {
 }
 
 trait Receiver {
-  def give(out: Int): Unit
+  def give(out: Long): Unit
 }
 object Receiver {
   def nop: Receiver = _ => ()
 }
 
 class ListReceiver extends Receiver {
-  var output: List[Int] = Nil
+  var output: List[Long] = Nil
 
-  override def give(out: Int): Unit = {
+  override def give(out: Long): Unit = {
     output = output :+ out
   }
 }
 
-class IntcodeBuffer(implicit ec: ExecutionContext) extends Provider with Receiver {
-  val buf = scala.collection.mutable.ListBuffer[Int]()
-  val waiting = scala.collection.mutable.ListBuffer[Promise[Int]]()
+class IntcodeBuffer extends Provider with Receiver {
+  private val buf = scala.collection.mutable.ListBuffer[Long]()
+  private val waiting = scala.collection.mutable.ListBuffer[Promise[Long]]()
 
-  override def take: Future[Int] = {
+  override def take: Future[Long] = {
     this.synchronized {
       if (buf.nonEmpty) {
         val n = buf.remove(0)
         Future.successful(n)
       } else {
-        val p = Promise[Int]
+        val p = Promise[Long]
         waiting.append(p)
         p.future
       }
     }
   }
 
-  override def give(out: Int): Unit = {
+  override def give(out: Long): Unit = {
     this.synchronized {
       if (waiting.nonEmpty) {
         val tip = waiting.remove(0)

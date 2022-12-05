@@ -28,6 +28,18 @@ trait Support {
   @deprecated
   def loadIntSeq: Seq[Int] = loadIntSeq()
 
+  def longSeq(input: String, delimiter: String = newline): Seq[Long] =
+    input
+      .split(delimiter)
+      .filter(_ != "")
+      .map(_.toLong)
+
+  def loadLongSeq(delimiter: String = newline): Seq[Long] =
+    longSeq(load, delimiter)
+
+  @deprecated
+  def loadLongSeq: Seq[Long] = loadLongSeq()
+
   def `2dIntSeq`(input: String, delimiterA: String = newline, delimiterB: String = " "): Seq[Seq[Int]] =
     input
       .split(delimiterA)
