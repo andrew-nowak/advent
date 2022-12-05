@@ -37,6 +37,7 @@ object nineteen extends ScalaModule with Common {
   object seven extends ScalaModule with Common
   object eight extends ScalaModule with Common
   object nine extends ScalaModule with Common
+  object ten extends ScalaModule with Common
 }
 
 object twentyone extends ScalaModule with Common {

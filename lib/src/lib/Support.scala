@@ -1,5 +1,6 @@
 package lib
 
+import scala.annotation.tailrec
 import scala.io.Source
 
 trait Support {
@@ -56,4 +57,7 @@ trait Support {
   def load2dIntSeqWithCoords(delimiterA: String = newline, delimiterB: String = " "): Map[Coord, Int] =
     `2dIntSeqWithCoords`(load, delimiterA, delimiterB)
 
+  @tailrec
+  final def gcd(a: Int, b: Int): Int =
+    if (b == 0) a else gcd(b, a % b)
 }
