@@ -26,35 +26,42 @@ object TwentytwoFive extends App with Support {
 
     val stacks = Seq.fill(nStacks)(Seq.empty[Char])
 
-    val contents = in.takeWhile(_.contains('[')).foldLeft(stacks)((stacks, line) => {
-      stacks.zipWithIndex.map {
-        case (st, i) =>
+    val contents = in
+      .takeWhile(_.contains('['))
+      .foldLeft(stacks)((stacks, line) => {
+        stacks.zipWithIndex.map { case (st, i) =>
           Try(line.charAt(4 * i + 1)).toOption.filterNot(_ == ' ').map(st :+ _).getOrElse(st)
-      }
-    })
+        }
+      })
 
     val instructionR = """move (\d+) from (\d+) to (\d+)""".r
-    val instructions = in.dropWhile(!_.startsWith("move")).flatMap {
-      case instructionR(n, from, to) => Seq.fill(n.toInt)((from.toInt - 1, to.toInt - 1))
+    val instructions = in.dropWhile(!_.startsWith("move")).flatMap { case instructionR(n, from, to) =>
+      Seq.fill(n.toInt)((from.toInt - 1, to.toInt - 1))
     }
-    val p1 = instructions.foldLeft(contents)((stacks, instr) => {
-      val (from, to) = instr
-      val x = stacks(from)
-      val y = stacks(to)
+    val p1 = instructions
+      .foldLeft(contents)((stacks, instr) => {
+        val (from, to) = instr
+        val x = stacks(from)
+        val y = stacks(to)
 
-      stacks.updated(from, x.tail).updated(to, x.head +: y)
-    }).map(_.head).mkString
+        stacks.updated(from, x.tail).updated(to, x.head +: y)
+      })
+      .map(_.head)
+      .mkString
 
-    val p2Instructions = in.dropWhile(!_.startsWith("move")).map {
-      case instructionR(n, from, to) => (n.toInt, from.toInt - 1, to.toInt - 1)
+    val p2Instructions = in.dropWhile(!_.startsWith("move")).map { case instructionR(n, from, to) =>
+      (n.toInt, from.toInt - 1, to.toInt - 1)
     }
 
-    val p2 = p2Instructions.foldLeft(contents)((stacks, instr)=> {
-      val (n, from, to) = instr
-      val x = stacks(from)
-      val y = stacks(to)
-      stacks.updated(from, x.drop(n)).updated(to, x.take(n) ++ y)
-    }).map(_.head).mkString
+    val p2 = p2Instructions
+      .foldLeft(contents)((stacks, instr) => {
+        val (n, from, to) = instr
+        val x = stacks(from)
+        val y = stacks(to)
+        stacks.updated(from, x.drop(n)).updated(to, x.take(n) ++ y)
+      })
+      .map(_.head)
+      .mkString
 
     println(p1)
 

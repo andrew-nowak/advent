@@ -8,7 +8,7 @@ case class AsyncIntcode(
     instructionPointer: Long,
     input: Provider = Provider.nop,
     output: Receiver = Receiver.nop,
-    relativeBase: Long = 0,
+    relativeBase: Long = 0
 )(implicit val executionContext: ExecutionContext) {
   def memoryAccess(n: Long): Long = memory.getOrElse(n, 0)
   private def getMode(opcode: Long, position: Long): Long =
@@ -24,7 +24,7 @@ case class AsyncIntcode(
       case 0            => memoryAccess(memoryAccess(instructionPointer + position))
       case 1            => memoryAccess(instructionPointer + position)
       case 2 if writing => relativeBase + memoryAccess(instructionPointer + position)
-      case 2 => memoryAccess(relativeBase + memoryAccess(instructionPointer + position))
+      case 2            => memoryAccess(relativeBase + memoryAccess(instructionPointer + position))
     }
   }
   private def pow10(n: Long) = Math.pow(10, n).toLong
@@ -129,7 +129,7 @@ object AsyncIntcode {
       case 6  => run(intcode.jumpIfFalse(opcode))
       case 7  => run(intcode.lessThan(opcode))
       case 8  => run(intcode.equal(opcode))
-      case 9 => run(intcode.adjustRelativeBase(opcode))
+      case 9  => run(intcode.adjustRelativeBase(opcode))
     }
   }
 
