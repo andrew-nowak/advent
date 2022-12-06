@@ -60,4 +60,22 @@ trait Support {
   @tailrec
   final def gcd(a: Int, b: Int): Int =
     if (b == 0) a else gcd(b, a % b)
+
+  def printCoords(s: Seq[Coord]) = {
+    val horiz = s.map(_.x)
+    val left = horiz.min
+    val right = horiz.max
+    val vert = s.map(_.y)
+    val top = vert.min
+    val bot = vert.max
+
+    val cs = s.toSet
+
+    for { y <- (top to bot).reverse } {
+      val line = for { x <- left to right } yield {
+        if (cs.contains(Coord(x, y))) '█' else ' '
+      }
+      println(line.mkString)
+    }
+  }
 }
