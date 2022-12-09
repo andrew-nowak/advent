@@ -2,11 +2,16 @@ package lib
 
 case class Coord(x: Int, y: Int) {
   def cardinalNeighbours: Seq[Coord] = Seq(
-    Coord(x - 1, y),
-    Coord(x + 1, y),
-    Coord(x, y - 1),
-    Coord(x, y + 1)
+    left,
+    right,
+    up,
+    down
   )
+
+  def up: Coord = Coord(x, y - 1)
+  def down: Coord = Coord(x, y + 1)
+  def left: Coord = Coord(x - 1, y)
+  def right: Coord = Coord(x + 1, y)
 
   /** Neighbours not including self
     * @return
