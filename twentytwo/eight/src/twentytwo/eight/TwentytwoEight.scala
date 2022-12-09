@@ -15,9 +15,9 @@ object TwentytwoEight extends App with Support {
   val input = load
 
   def countTrees(ts: Seq[(Coord, Int)]): Set[Coord] =
-    ts.foldLeft((-1, Set.empty[Coord])){
+    ts.foldLeft((-1, Set.empty[Coord])) {
       case ((highest, seen), tree) if tree._2 > highest => (tree._2, seen + tree._1)
-      case (acc, _) => acc
+      case (acc, _)                                     => acc
     }._2
 
   def run(data: String) = {

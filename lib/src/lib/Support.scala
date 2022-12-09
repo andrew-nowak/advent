@@ -12,7 +12,7 @@ trait Support {
   def load: String = loadDirty.trim
 
   def stringSeq(input: String, delimiter: String): Seq[String] =
-    input.split(delimiter)
+    input.split(delimiter).toIndexedSeq
   def loadStringSeq(delimiter: String): Seq[String] =
     stringSeq(load, delimiter)
 
@@ -24,6 +24,7 @@ trait Support {
       .split(delimiter)
       .filter(_ != "")
       .map(_.toInt)
+      .toIndexedSeq
   def loadIntSeq(delimiter: String = newline): Seq[Int] =
     intSeq(load, delimiter)
   @deprecated
@@ -34,6 +35,7 @@ trait Support {
       .split(delimiter)
       .filter(_ != "")
       .map(_.toLong)
+      .toIndexedSeq
 
   def loadLongSeq(delimiter: String = newline): Seq[Long] =
     longSeq(load, delimiter)
@@ -46,6 +48,7 @@ trait Support {
       .split(delimiterA)
       .filter(_ != "")
       .map(_.split(delimiterB).map(_.toInt).toSeq)
+      .toIndexedSeq
   def load2dIntSeq(delimiterA: String = newline, delimiterB: String = " "): Seq[Seq[Int]] =
     `2dIntSeq`(load, delimiterA, delimiterB)
   @deprecated def load2dIntSeq: Seq[Seq[Int]] = load2dIntSeq()
