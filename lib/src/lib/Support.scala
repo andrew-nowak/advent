@@ -61,8 +61,14 @@ trait Support {
     `2dIntSeqWithCoords`(load, delimiterA, delimiterB)
 
   @tailrec
-  final def gcd(a: Int, b: Int): Int =
+  final def gcd(a: Long, b: Long): Long =
     if (b == 0) a else gcd(b, a % b)
+
+  final def lcm(a: Long, b: Long): Long =
+    (a / gcd(a, b)) * b
+
+  final def clamp(n: Long): Long = Math.min(1, Math.max(-1, n))
+  final def clamp(n: Int): Int = Math.min(1, Math.max(-1, n))
 
   def printCoords(s: Seq[Coord]) = {
     val horiz = s.map(_.x)
