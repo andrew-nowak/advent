@@ -87,4 +87,20 @@ trait Support {
       println(line.mkString)
     }
   }
+
+  def printCoords(m: Map[Coord, Int], printer: PartialFunction[Int, Char]) = {
+    val horiz = m.keys.map(_.x)
+    val left = horiz.min
+    val right = horiz.max
+    val vert = m.keys.map(_.y)
+    val top = vert.min
+    val bot = vert.max
+
+    for { y <- (top to bot).reverse } {
+      val line = for { x <- left to right } yield {
+        m.get(Coord(x, y)).flatMap(printer.lift).getOrElse(' ')
+      }
+      println(line.mkString)
+    }
+  }
 }
