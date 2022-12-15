@@ -80,4 +80,5 @@ object twentytwo extends Module {
   object ten extends ScalaModule with Common
   object eleven extends ScalaModule with Common
   object twelve extends ScalaModule with Common
+  object thirteen extends ScalaModule with Common
 }
