@@ -24,7 +24,7 @@ object TwentytwoSixteen extends App with Support {
   val input = load
 
   case class State(location: String, openValves: Seq[String], time: Int, pressure: Int, recentlyVisited: Seq[String])
-  case class P2State(locationA: String, locationB: String, openValves: Set[Valve], time: Int, pressure: Int, recentlyVisited: Set[String])
+  case class P2State(locationA: String, locationB: String, openValves: Set[Valve], time: Int, pressure: Int, recentlyVisitedA: Set[String], recentlyVisitedB: Set[String])
   def run(data: String) = {
     val in = stringSeq(data)
     val valveLookup = in.map { case parseR(name, flow, tunnels) => name -> Valve(name, flow.toInt, tunnels.split(", ").toSeq) }.toMap
@@ -58,11 +58,26 @@ object TwentytwoSixteen extends App with Support {
 //    val p1 = search(List(initialState), 0)
 //    println(p1)
 
+    val paths = flowableValves.toSeq.combinations(2).flatMap { case Seq(valveA, valveB) =>
+      @tailrec def route(state: List[(String, Seq[String])]): Seq[String] = {
+        if (state.head._1 == valveB) state.head._2 :+ valveB
+        else {
+          val next = valveLookup(state.head._1).tunnels.filterNot(state.head._2.contains)
+
+          val q = (state.tail ++ next.map(_ -> (state.head._2 :+ state.head._1))).sortBy(_._2.size)
+          route(q)
+        }
+      }
+      val path = route(List(valveA -> Seq.empty))
+      Seq((valveA, valveB) -> path, (valveB, valveA) -> path)
+    }
+    println(paths.toMap)
+
     def potential(state: P2State): Int = {
       state.pressure + // released pressure
         state.openValves.map(_.flow).sum * (26 - state.time) + // this turn
 //        maxFlow * (26 - 1 - state.time)
-        valves.diff(state.openValves).toSeq.map(_.flow).filterNot(_ == 0).sorted.reverse.zipWithIndex.map { case (f, i) => (26 - (state.time + 1 + (i / 2))) * f}.sum
+        valves.diff(state.openValves).toSeq.map(_.flow).filterNot(_ == 0).sorted.reverse.zipWithIndex.map { case (f, i) => (26 - (state.time + (i / 2))) * f}.sum
     }
 
     @tailrec def p2Search(q: List[P2State], best: Int): Int = {
@@ -72,29 +87,29 @@ object TwentytwoSixteen extends App with Support {
       else {
         val state = q.head
         if (state.time == 26) {
-          if (state.pressure > best) println(state.pressure)
+          if (state.pressure > best) println(state.pressure, n)
           p2Search(q.tail, Math.max(best, state.pressure))
         } else if (state.openValves.size == flowableValvesSize) {
           // all valves open; do no moves and fastforward
           val pressure = state.pressure + state.openValves.map(_.flow).sum * (26 - state.time)
           p2Search(q.tail, Math.max(best, pressure))
 //                  } else if (state.pressure + state.openValves.map(_.flow).sum + maxFlow * (26 - 1 - state.time) <= best) { // impossible to beat current best
-        } else if (best > 0 && potential(state) <= best) {
-          p2Search(q.tail, best)
+//        } else if (best > 0 && potential(state) <= best) {
+//          p2Search(q.tail, best)
         } else {
           val pressure = state.pressure + state.openValves.map(_.flow).sum
-          val recentlyVisited = state.recentlyVisited + state.locationA + state.locationB
+//          val recentlyVisited = state.recentlyVisited + state.locationA + state.locationB
           val openHereA = if (!(state.openValves.map(_.name) contains state.locationA) && flowableValves.contains(state.locationA)) Some(
-            state.copy(openValves = state.openValves + valveLookup(state.locationA))
+            state.copy(openValves = state.openValves + valveLookup(state.locationA), recentlyVisitedA = Set.empty)
           ) else None
           val openHereB = if (!(state.openValves.map(_.name) contains state.locationB) && flowableValves.contains(state.locationB)) Some(
-            state.copy(openValves = state.openValves + valveLookup(state.locationB))
+            state.copy(openValves = state.openValves + valveLookup(state.locationB), recentlyVisitedB = Set.empty)
           ) else None
-          val movesA = valveLookup(state.locationA).tunnels.filterNot(recentlyVisited.contains).map(
-            tun => state.copy(locationA = tun)
+          val movesA = valveLookup(state.locationA).tunnels.filterNot(state.recentlyVisitedA.contains).map(
+            tun => state.copy(locationA = tun, recentlyVisitedA = state.recentlyVisitedA + state.locationA)
           )
-          val movesB = valveLookup(state.locationB).tunnels.filterNot(recentlyVisited.contains).map(
-            tun => state.copy(locationB = tun)
+          val movesB = valveLookup(state.locationB).tunnels.filterNot(state.recentlyVisitedB.contains).map(
+            tun => state.copy(locationB = tun, recentlyVisitedB = state.recentlyVisitedB + state.locationB)
           )
           val statesA = (openHereA ++ movesA)
           val statesB = (openHereB ++ movesB)
@@ -103,20 +118,21 @@ object TwentytwoSixteen extends App with Support {
             a.copy(
               locationB = b.locationB,
               openValves = openValves,
-              recentlyVisited = if (openValves.size > state.openValves.size) Set.empty else recentlyVisited,
+//              recentlyVisited = if (openValves.size > state.openValves.size) Set.empty else recentlyVisited,
               time = state.time + 1,
-              pressure = pressure
+              pressure = pressure,
+              recentlyVisitedB = b.recentlyVisitedB
             )
           }).toList
 //          val nextStates = ().map(_.copy(time = state.time + 1, pressure = pressure)).toList
-          p2Search(nextStates ++ q.tail, best)
+          p2Search((nextStates ++ q.tail).sortBy(-_.pressure), best)
         }
       }
     }
-    val initialP2 = P2State(start, start, Set.empty, 0, 0, Set.empty)
+    val initialP2 = P2State(start, start, Set.empty, 0, 0, Set.empty, Set.empty)
 
-    val p2 = p2Search(List(initialP2), 0)
-    println(p2)
+//    val p2 = p2Search(List(initialP2), 0)
+//    println(p2)
   }
 
   println("--- testdata ---")
