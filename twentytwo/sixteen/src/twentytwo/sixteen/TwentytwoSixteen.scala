@@ -4,8 +4,6 @@ import lib.Support
 
 import scala.annotation.tailrec
 
-case class Valve(name: String, flow: Int, tunnels: Seq[String])
-//noinspection DuplicatedCode
 object TwentytwoSixteen extends App with Support {
   val parseR = """Valve ([A-Z]{2}) has flow rate=(\d+); tunnels? leads? to valves? (.*)""".r
   val testData =
@@ -23,116 +21,91 @@ object TwentytwoSixteen extends App with Support {
       |""".stripMargin.trim
   val input = load
 
-  case class State(location: String, openValves: Seq[String], time: Int, pressure: Int, recentlyVisited: Seq[String])
-  case class P2State(locationA: String, locationB: String, openValves: Set[Valve], time: Int, pressure: Int, recentlyVisitedA: Set[String], recentlyVisitedB: Set[String])
-  def run(data: String) = {
+  case class Valve(name: String, flow: Int, tunnels: Seq[String])
+  case class State(location: String, openValves: Set[String], time: Int, pressure: Int)
+
+  def run(data: String): Unit = {
     val in = stringSeq(data)
-    val valveLookup = in.map { case parseR(name, flow, tunnels) => name -> Valve(name, flow.toInt, tunnels.split(", ").toSeq) }.toMap
+    val valveLookup = in.map { case parseR(name, flow, tunnels) =>
+      name -> Valve(name, flow.toInt, tunnels.split(", ").toSeq)
+    }.toMap
     val valves = valveLookup.values.toSet
     val flowableValves = valves.filter(_.flow > 0).map(_.name)
-    val flows = valves.map(_.flow).filterNot(_ == 0)
-    val maxFlow = valves.map(_.flow).sum
     val flowableValvesSize = flowableValves.size
     val start = "AA"
-    val initialState = State(start, Seq.empty, 0, 0, Seq.empty)
-    var n = 0
+    val initialState = State(start, Set.empty, 0, 0)
 
-    @tailrec def search(q: List[State], best: Int): Int = {
-      if (q.isEmpty) best
-      else {
-        val state = q.head
-        val pressure = state.pressure + state.openValves.map(valveLookup).map(_.flow).sum
-        if (state.time == 30) {
-          search(q.tail, Math.max(best, state.pressure))
+    val paths = (flowableValves.toSeq.combinations(2) ++ flowableValves.toSeq.map(Seq("AA", _))).flatMap {
+      case Seq(valveA, valveB) =>
+        @tailrec def route(state: List[(String, Seq[String])]): Seq[String] = {
+          if (state.head._1 == valveB) state.head._2 :+ valveB
+          else {
+            val next = valveLookup(state.head._1).tunnels.filterNot(state.head._2.contains)
+
+            val q = (state.tail ++ next.map(_ -> (state.head._2 :+ state.head._1))).sortBy(_._2.size)
+            route(q)
+          }
         }
+
+        val path = route(List(valveA -> Seq.empty))
+        Seq((valveA, valveB) -> path, (valveB, valveA) -> path)
+    }.toMap
+
+    def doTheSearch(initialState: State, availableValves: Set[String], maxTime: Int): State = {
+      def flow(state: State): Int = state.openValves.map(valveLookup).map(_.flow).sum
+      @tailrec def search(q: List[State], best: State): State = {
+        if (q.isEmpty) best
         else {
-          val recentlyVisited = state.recentlyVisited :+ state.location
-          val openHere = if (!(state.openValves contains state.location) && flowableValves.contains(state.location)) Some(state.copy(openValves = state.openValves :+ state.location, recentlyVisited = Seq.empty)) else None
-          val moves = valveLookup(state.location).tunnels.filterNot(recentlyVisited contains _).map(tun => state.copy(location = tun, recentlyVisited = recentlyVisited))
-          val nextStates = (openHere ++ moves).map(_.copy(time = state.time + 1, pressure = pressure)).toList
-          search(nextStates ++ q.tail, best)
-        }
-      }
-    }
-
-//    val p1 = search(List(initialState), 0)
-//    println(p1)
-
-    val paths = flowableValves.toSeq.combinations(2).flatMap { case Seq(valveA, valveB) =>
-      @tailrec def route(state: List[(String, Seq[String])]): Seq[String] = {
-        if (state.head._1 == valveB) state.head._2 :+ valveB
-        else {
-          val next = valveLookup(state.head._1).tunnels.filterNot(state.head._2.contains)
-
-          val q = (state.tail ++ next.map(_ -> (state.head._2 :+ state.head._1))).sortBy(_._2.size)
-          route(q)
-        }
-      }
-      val path = route(List(valveA -> Seq.empty))
-      Seq((valveA, valveB) -> path, (valveB, valveA) -> path)
-    }
-    println(paths.toMap)
-
-    def potential(state: P2State): Int = {
-      state.pressure + // released pressure
-        state.openValves.map(_.flow).sum * (26 - state.time) + // this turn
-//        maxFlow * (26 - 1 - state.time)
-        valves.diff(state.openValves).toSeq.map(_.flow).filterNot(_ == 0).sorted.reverse.zipWithIndex.map { case (f, i) => (26 - (state.time + (i / 2))) * f}.sum
-    }
-
-    @tailrec def p2Search(q: List[P2State], best: Int): Int = {
-      n += 1
-
-      if (q.isEmpty) best
-      else {
-        val state = q.head
-        if (state.time == 26) {
-          if (state.pressure > best) println(state.pressure, n)
-          p2Search(q.tail, Math.max(best, state.pressure))
-        } else if (state.openValves.size == flowableValvesSize) {
-          // all valves open; do no moves and fastforward
-          val pressure = state.pressure + state.openValves.map(_.flow).sum * (26 - state.time)
-          p2Search(q.tail, Math.max(best, pressure))
-//                  } else if (state.pressure + state.openValves.map(_.flow).sum + maxFlow * (26 - 1 - state.time) <= best) { // impossible to beat current best
-//        } else if (best > 0 && potential(state) <= best) {
-//          p2Search(q.tail, best)
-        } else {
-          val pressure = state.pressure + state.openValves.map(_.flow).sum
-//          val recentlyVisited = state.recentlyVisited + state.locationA + state.locationB
-          val openHereA = if (!(state.openValves.map(_.name) contains state.locationA) && flowableValves.contains(state.locationA)) Some(
-            state.copy(openValves = state.openValves + valveLookup(state.locationA), recentlyVisitedA = Set.empty)
-          ) else None
-          val openHereB = if (!(state.openValves.map(_.name) contains state.locationB) && flowableValves.contains(state.locationB)) Some(
-            state.copy(openValves = state.openValves + valveLookup(state.locationB), recentlyVisitedB = Set.empty)
-          ) else None
-          val movesA = valveLookup(state.locationA).tunnels.filterNot(state.recentlyVisitedA.contains).map(
-            tun => state.copy(locationA = tun, recentlyVisitedA = state.recentlyVisitedA + state.locationA)
-          )
-          val movesB = valveLookup(state.locationB).tunnels.filterNot(state.recentlyVisitedB.contains).map(
-            tun => state.copy(locationB = tun, recentlyVisitedB = state.recentlyVisitedB + state.locationB)
-          )
-          val statesA = (openHereA ++ movesA)
-          val statesB = (openHereB ++ movesB)
-          val nextStates = (for { a <- statesA; b <- statesB if a.locationA != b.locationB } yield {
-            val openValves = a.openValves | b.openValves
-            a.copy(
-              locationB = b.locationB,
-              openValves = openValves,
-//              recentlyVisited = if (openValves.size > state.openValves.size) Set.empty else recentlyVisited,
-              time = state.time + 1,
-              pressure = pressure,
-              recentlyVisitedB = b.recentlyVisitedB
+          val state = q.head
+          val closedValves = availableValves.diff(state.openValves)
+          if (state.time == maxTime) {
+            search(q.tail, if (state.pressure > best.pressure) state else best)
+          } else if (state.time > maxTime) {
+            throw new Error(s"exceeded time!! $state")
+          } else if (closedValves.isEmpty) {
+            search(
+              state.copy(time = maxTime, pressure = state.pressure + flow(state) * (maxTime - state.time)) +: q.tail,
+              best
             )
-          }).toList
-//          val nextStates = ().map(_.copy(time = state.time + 1, pressure = pressure)).toList
-          p2Search((nextStates ++ q.tail).sortBy(-_.pressure), best)
+          } else {
+            val newStates = closedValves.flatMap(cv => {
+              val dist = paths(state.location -> cv).size
+              if (state.time + dist > maxTime) None
+              else {
+                val st = state.copy(
+                  location = cv,
+                  openValves = state.openValves + cv,
+                  time = state.time + dist,
+                  pressure = state.pressure + flow(state) * dist
+                )
+                Some(st)
+              }
+            })
+            val noMoreMovesState = state.copy(
+              time = maxTime,
+              pressure = state.pressure + flow(state) * (maxTime - state.time)
+            )
+            search(noMoreMovesState :: newStates.toList ::: q.tail, best)
+          }
         }
       }
+      search(List(initialState), State(location = "", openValves = Set.empty, time = 0, pressure = 0))
     }
-    val initialP2 = P2State(start, start, Set.empty, 0, 0, Set.empty, Set.empty)
 
-//    val p2 = p2Search(List(initialP2), 0)
-//    println(p2)
+    val p1 = doTheSearch(initialState, flowableValves, 30)
+    println(p1.pressure)
+
+    val fvs = flowableValves.toSeq
+    val responsibilities =
+      (0 to flowableValvesSize / 2).flatMap(n => fvs.combinations(n)).map(_.toSet).map(l => (l, flowableValves.diff(l)))
+    println(s"responsibility possibilities: ${responsibilities.size}")
+
+    val p2 = responsibilities.zipWithIndex.map { case ((myValves, elephantValves), i) =>
+      if (i % 50 == 0) println(i)
+      doTheSearch(initialState, myValves, 26).pressure + doTheSearch(initialState, elephantValves, 26).pressure
+    }.max
+
+    println(p2)
   }
 
   println("--- testdata ---")
