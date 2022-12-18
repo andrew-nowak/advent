@@ -35,4 +35,19 @@ case class Coord(x: Int, y: Int) {
 
 case class Coord3d(x: Int, y: Int, z: Int) {
   def +(o: Coord3d): Coord3d = Coord3d(x + o.x, y + o.y, z + o.z)
+
+  def surrounding: Seq[Coord3d] = for {
+    nz <- (z - 1) to (z + 1)
+    ny <- (y - 1) to (y + 1)
+    nx <- (x - 1) to (x + 1)
+  } yield Coord3d(nx, ny, nz)
+
+  def cardinalNeighbours: Seq[Coord3d] = Seq(
+    Coord3d(x + 1, y, z),
+    Coord3d(x - 1, y, z),
+    Coord3d(x, y + 1, z),
+    Coord3d(x, y - 1, z),
+    Coord3d(x, y, z + 1),
+    Coord3d(x, y, z - 1)
+  )
 }
