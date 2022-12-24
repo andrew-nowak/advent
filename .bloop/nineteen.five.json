@@ -1,0 +1,81 @@
+{
+    "version": "1.4.0",
+    "project": {
+        "name": "nineteen.five",
+        "directory": "/home/andrew/workspace/advent/nineteen/five",
+        "workspaceDir": "/home/andrew/workspace/advent",
+        "sources": [
+            "/home/andrew/workspace/advent/nineteen/five/src"
+        ],
+        "dependencies": [
+            "lib[2.13.8]"
+        ],
+        "classpath": [
+            "/home/andrew/workspace/advent/.bloop/out/lib[2.13.8]/classes",
+            "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.8/scala-library-2.13.8.jar"
+        ],
+        "out": "/home/andrew/workspace/advent/.bloop/out/nineteen.five",
+        "classesDir": "/home/andrew/workspace/advent/.bloop/out/nineteen.five/classes",
+        "resources": [
+            "/home/andrew/workspace/advent/nineteen/five/resources"
+        ],
+        "scala": {
+            "organization": "org.scala-lang",
+            "name": "scala-compiler",
+            "version": "2.13.8",
+            "options": [
+                
+            ],
+            "jars": [
+                "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.8/scala-compiler-2.13.8.jar",
+                "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.8/scala-reflect-2.13.8.jar",
+                "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.8/scala-library-2.13.8.jar",
+                "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.21.0/jline-3.21.0.jar",
+                "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/5.9.0/jna-5.9.0.jar"
+            ]
+        },
+        "java": {
+            "options": [
+                
+            ]
+        },
+        "platform": {
+            "name": "jvm",
+            "config": {
+                "home": "/usr/lib/jvm/default",
+                "options": [
+                    "-Duser.dir=/home/andrew/workspace/advent"
+                ]
+            },
+            "mainClass": [
+                
+            ],
+            "resources": [
+                "/home/andrew/workspace/advent/nineteen/five/resources"
+            ]
+        },
+        "resolution": {
+            "modules": [
+                {
+                    "organization": "org.scala-lang",
+                    "name": "scala-library",
+                    "version": "2.13.8",
+                    "artifacts": [
+                        {
+                            "name": "scala-library",
+                            "path": "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.8/scala-library-2.13.8.jar"
+                        },
+                        {
+                            "name": "scala-library",
+                            "classifier": "sources",
+                            "path": "/home/andrew/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.8/scala-library-2.13.8-sources.jar"
+                        }
+                    ]
+                }
+            ]
+        },
+        "tags": [
+            "library"
+        ]
+    }
+}

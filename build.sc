@@ -1,13 +1,23 @@
 import mill._, scalalib._, scalafmt._
 
-object lib extends ScalaModule {
-  def scalaVersion = "2.13.7"
+val sc213 = "2.13.8"
+val sc3 = "3.1.1"
+
+object lib extends Cross[Lib](sc213, sc3) {
+}
+class Lib(val crossScalaVersion: String) extends CrossScalaModule {
+  //def suffix = T { crossVersion }
+  //def bigSuffix = T { suffix().toUpperCase }
 }
 
 trait Common extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "2.13.7"
+  def scalaVersion = sc213
 
-  override def moduleDeps: Seq[JavaModule] = Seq(lib)
+  override def moduleDeps: Seq[JavaModule] = Seq(lib(sc213))
+}
+trait Common3 extends ScalaModule with ScalafmtModule {
+  def scalaVersion = sc3
+  override def moduleDeps: Seq[JavaModule] = Seq(lib(sc3))
 }
 
 trait Json extends ScalaModule {
@@ -44,6 +54,7 @@ object twentyone extends ScalaModule with Common {
   object sixteen extends ScalaModule with Common
   object seventeen extends ScalaModule with Common
   object eighteen extends ScalaModule with Common with Json
+  object nineteen extends ScalaModule with Common3
   object twenty extends ScalaModule with Common
   object twentytwo extends ScalaModule with Common
   object twentythree extends ScalaModule with Common
