@@ -1,5 +1,28 @@
 package lib
 
+sealed trait Direction {
+  def cw: Direction
+  def ccw: Direction
+}
+object Direction {
+  object Up extends Direction {
+    def cw = Right
+    def ccw = Left
+  }
+  object Down extends Direction {
+    def cw = Left
+    def ccw = Right
+  }
+  object Left extends Direction {
+    def cw = Up
+    def ccw = Down
+  }
+  object Right extends Direction {
+    def cw = Down
+    def ccw = Up
+  }
+}
+
 case class Coord(x: Int, y: Int) {
   def cardinalNeighbours: Seq[Coord] = Seq(
     left,

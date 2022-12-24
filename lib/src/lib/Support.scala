@@ -96,7 +96,7 @@ trait Support {
     val top = vert.min
     val bot = vert.max
 
-    for { y <- (top to bot).reverse } {
+    for { y <- (top to bot) } {
       val line = for { x <- left to right } yield {
         m.get(Coord(x, y)).flatMap(printer.lift).getOrElse(' ')
       }

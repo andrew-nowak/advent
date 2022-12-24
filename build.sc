@@ -14,13 +14,6 @@ trait Common extends ScalaModule with ScalafmtModule {
   override def moduleDeps: Seq[JavaModule] = Seq(lib)
 }
 
-trait Common3 extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "3.2.0"
-
-  def scalacOptions = Seq("-deprecation")
-
-  override def moduleDeps: Seq[JavaModule] = Seq(lib)
-}
 trait Json extends ScalaModule {
   def ivyDeps = Agg(
     ivy"com.typesafe.play::play-json:2.9.2",
@@ -89,4 +82,5 @@ object twentytwo extends Module {
   object nineteen extends ScalaModule with Common
   object twenty extends ScalaModule with Common
   object twentyone extends ScalaModule with Common
+  object twentytwo extends ScalaModule with Common
 }
