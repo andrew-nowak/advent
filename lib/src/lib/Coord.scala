@@ -4,20 +4,20 @@ sealed trait Direction {
   def cw: Direction
   def ccw: Direction
 }
-object Direction {
-  object Up extends Direction {
+case object Direction {
+  case object Up extends Direction {
     def cw = Right
     def ccw = Left
   }
-  object Down extends Direction {
+  case object Down extends Direction {
     def cw = Left
     def ccw = Right
   }
-  object Left extends Direction {
+  case object Left extends Direction {
     def cw = Up
     def ccw = Down
   }
-  object Right extends Direction {
+  case object Right extends Direction {
     def cw = Down
     def ccw = Up
   }

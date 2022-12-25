@@ -60,6 +60,16 @@ trait Support {
   def load2dIntSeqWithCoords(delimiterA: String = newline, delimiterB: String = " "): Map[Coord, Int] =
     `2dIntSeqWithCoords`(load, delimiterA, delimiterB)
 
+  def charCoords(input: String, delimiter: String = newline): Map[Coord, Char] = {
+    input
+      .split(delimiter)
+      .zipWithIndex
+      .flatMap { case (row, y) =>
+        row.zipWithIndex.map { case (c, x) => Coord(x, y) -> c }
+      }
+      .toMap
+  }
+
   @tailrec
   final def gcd(a: Long, b: Long): Long =
     if (b == 0) a else gcd(b, a % b)
