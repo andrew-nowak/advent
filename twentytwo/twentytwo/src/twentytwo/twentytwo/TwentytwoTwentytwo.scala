@@ -3,7 +3,7 @@ package twentytwo.twentytwo
 import lib.Support
 import lib.Coord
 import lib.Direction
-import lib.Produce
+import lib.SeqExtras
 import scala.annotation.tailrec
 
 case class Position(location: Coord, direction: Direction)
@@ -118,7 +118,7 @@ object TwentytwoTwentytwo extends App with Support {
     case instrs =>
       val (distraw, rest) = instrs.span(_.isDigit)
       val dist = distraw.mkString.toInt
-      val steps = Produce.produce(1 to dist)(pos)((prev, _) => resolveP2(prev))
+      val steps = SeqExtras.produce(1 to dist)(pos)((prev, _) => resolveP2(prev))
 
       val nextposition = steps
         .takeWhile(step => { /*println(step);*/

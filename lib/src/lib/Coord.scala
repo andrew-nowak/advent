@@ -36,6 +36,15 @@ case class Coord(x: Int, y: Int) {
   def left: Coord = Coord(x - 1, y)
   def right: Coord = Coord(x + 1, y)
 
+  def north: Coord = up
+  def south: Coord = down
+  def west: Coord = left
+  def east: Coord = right
+  def nw: Coord = Coord(x - 1, y - 1)
+  def ne: Coord = Coord(x + 1, y - 1)
+  def sw: Coord = Coord(x - 1, y + 1)
+  def se: Coord = Coord(x + 1, y + 1)
+
   /** Neighbours not including self
     * @return
     */
