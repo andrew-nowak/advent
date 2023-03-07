@@ -27,7 +27,7 @@ case class AsyncIntcode(
       case 2            => memoryAccess(relativeBase + memoryAccess(instructionPointer + position))
     }
   }
-  private def pow10(n: Long) = Math.pow(10, n).toLong
+  private def pow10(n: Long) = Math.pow(10, n.toDouble).toLong
 
   def add(opcode: Long): AsyncIntcode = {
     val inputA = resolve(opcode, 1)
@@ -207,7 +207,7 @@ class IntcodeBuffer extends Provider with Receiver {
         val n = buf.remove(0)
         Future.successful(n)
       } else {
-        val p = Promise[Long]
+        val p = Promise[Long]()
         waiting.append(p)
         p.future
       }
@@ -222,6 +222,24 @@ class IntcodeBuffer extends Provider with Receiver {
       } else {
         buf.append(out)
       }
+    }
+  }
+}
+
+class InOut[State](f: (Long, State) => (Long, State), initialState: State) extends Provider with Receiver {
+  private var s: State = initialState
+  private var last: Long = -1
+
+  override def take: Future[Long] = {
+    this.synchronized {
+      val (toSend, nextState) = f(last, s)
+      s = nextState
+      Future.successful(toSend)
+    }
+  }
+  override def give(out: Long): Unit = {
+    this.synchronized {
+      last = out
     }
   }
 }
