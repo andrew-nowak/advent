@@ -6,6 +6,12 @@ object lib extends ScalaModule {
   def scalacOptions = Seq("-deprecation")
 }
 
+trait Common3 extends ScalaModule with ScalafmtModule {
+  def scalacOptions = Seq("-deprecation")
+  def scalaVersion = "3.2.2"
+  override def moduleDeps: Seq[JavaModule] = Seq(lib)
+}
+
 trait Common extends ScalaModule with ScalafmtModule {
   def scalaVersion = "2.13.8"
 

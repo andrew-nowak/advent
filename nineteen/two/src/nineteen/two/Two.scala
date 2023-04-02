@@ -8,7 +8,7 @@ object Two extends App with Support {
 
   val part1 = Intcode.buildAndRunWithPhrase(in, 12, 2)
 
-  println(part1.memory.head)
+  println(part1.memory(0))
 
   val phrases = for {
     noun <- 0 until 100
@@ -17,7 +17,7 @@ object Two extends App with Support {
 
   val part2 = phrases
     .find { case (noun, verb) =>
-      Intcode.buildAndRunWithPhrase(in, noun, verb).memory.head == 19690720
+      Intcode.buildAndRunWithPhrase(in, noun, verb).memory(0) == 19690720L
     }
     .map { case (noun, verb) => 100 * noun + verb }
     .get
