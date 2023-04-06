@@ -3,6 +3,7 @@ package lib
 import scala.annotation.tailrec
 import scala.io.Source
 
+object Support extends Support
 trait Support {
   val newline = "\\r?\\n"
 
