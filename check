@@ -1,6 +1,0 @@
-#!/bin/bash
-# ln -s $(pwd)/check $(pwd)/.git/hooks/pre-commit
-
-set -ex
-
-mill mill.scalalib.scalafmt.ScalafmtModule/checkFormatAll __.sources
