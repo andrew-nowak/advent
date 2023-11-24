@@ -1,4 +1,8 @@
-ThisBuild / scalacOptions ++= Seq("-feature", "-deprecation")
+ThisBuild / scalacOptions ++= Seq(
+  "-feature", "-deprecation",
+  // don't show exhaustive match warnings pls
+  "-Wconf:msg=exhaustive:s"
+)
 ThisBuild / fork := true
 ThisBuild / javaOptions ++= Seq("-ea")
 
