@@ -49,7 +49,7 @@ object Three extends App with Support {
 
   val in = loadStringSeq
   val paths = in.map(_.split(","))
-  val wires = paths.map(p => wire(p))
+  val wires = paths.map(p => wire(p.toSeq))
 
   println(part1(wires))
   println(part2(wires))

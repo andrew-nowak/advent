@@ -39,9 +39,9 @@ object NineteenTen extends App with Support {
       val candidates = map - c
       val normed = candidates
         .groupBy(cand => {
-          val dx = cand.x - c.x
-          val dy = cand.y - c.y
-          val g = Math.abs(gcd(dx, dy))
+          val dx = (cand.x - c.x)
+          val dy = (cand.y - c.y)
+          val g = Math.abs(gcd(dx, dy)).toInt
           Coord(dx / g, dy / g)
         })
         .view

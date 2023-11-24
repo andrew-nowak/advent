@@ -15,5 +15,3 @@ lazy val y2021 = (project in file("2021")).settings(
 lazy val y2022 = (project in file("2022")).settings(
   scalaVersion := "2.13.12"
 ).dependsOn(lib)
-
-val `5` = "hi"

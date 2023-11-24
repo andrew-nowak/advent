@@ -6,7 +6,7 @@ object One extends App with Support {
 
   def calculateFuel(mass: Int): Int = (mass / 3) - 2
 
-  val input = loadIntSeq
+  val input = loadIntSeq()
 
   println(input.map(calculateFuel).sum)
 
