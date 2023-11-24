@@ -17,7 +17,7 @@ object TwentyoneFourteen extends App with Support {
     .toMap
 
   def step(rules: Map[String, String])(polymer: String): String = {
-    polymer.head + polymer.sliding(2).map(pair => rules(pair) + pair.last).mkString
+    polymer.head.toString + polymer.sliding(2).map(pair => rules(pair) + pair.last).mkString
   }
 
   val afterTen = LazyList.iterate(template)(step(pairInsertions)).apply(10)
@@ -63,7 +63,7 @@ object TwentyoneFourteen extends App with Support {
       case (pair, 0) :: rest => recstep(rest, answers.updated((pair, 0), Map(pair.head -> 2)), rules)
       case (head @ (pair, depth)) :: rest =>
         val production = rules.apply(pair)
-        val nextDown = List(pair.head + production, production + pair.last).map(_ -> (depth - 1))
+        val nextDown = List(pair.head.toString + production, production + pair.last).map(_ -> (depth - 1))
         if (nextDown.forall(answers.contains)) {
           val answer = mergeAnswers(nextDown.map(answers))
           val correctedAnswer = answer.updated(production.head, answer(production.head) - 1)

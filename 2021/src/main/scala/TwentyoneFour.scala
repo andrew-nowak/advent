@@ -35,6 +35,6 @@ object TwentyoneFour extends App with Support {
     }
   }
 
-  println(findBingoWinner(boards, Nil, numbers))
-  println(findFinalWinner(boards, Nil, numbers, Nil))
+  println(findBingoWinner(boards, Nil, numbers.toSeq))
+  println(findFinalWinner(boards, Nil, numbers.toSeq, Nil))
 }
