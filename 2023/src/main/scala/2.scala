@@ -17,10 +17,10 @@ object D2 extends App with Support:
 
   def isvalid(show: String): Boolean = {
     (redR.findFirstMatchIn(show), greenR.findFirstMatchIn(show), blueR.findFirstMatchIn(show)) match {
-      case (Some(red), _, _) if red.group(1).toInt > 12 => false
+      case (Some(red), _, _) if red.group(1).toInt > 12     => false
       case (_, Some(green), _) if green.group(1).toInt > 13 => false
-      case (_, _, Some(blue)) if blue.group(1).toInt > 14 => false
-      case _ => true
+      case (_, _, Some(blue)) if blue.group(1).toInt > 14   => false
+      case _                                                => true
     }
   }
 
@@ -35,12 +35,20 @@ object D2 extends App with Support:
       } else None
     }.sum
 
-
-    lazy val p2 = in.size
+    lazy val p2 = in.map { line =>
+      val shows = line.dropWhile(_ != ':').drop(2).split("; ")
+      val (r, g, b) = shows.foldLeft((0, 0, 0)) { case ((ra, ga, ba), show) =>
+        val red = math.max(ra, redR.findFirstMatchIn(show).map(_.group(1).toInt).getOrElse(-1))
+        val green = math.max(ga, greenR.findFirstMatchIn(show).map(_.group(1).toInt).getOrElse(-1))
+        val blue = math.max(ba, blueR.findFirstMatchIn(show).map(_.group(1).toInt).getOrElse(-1))
+        (red, green, blue)
+      }
+      r * g * b
+    }.sum
 
     println(p1)
 
-//    println(p2)
+    println(p2)
   }
 
   println("--- testdata ---")
