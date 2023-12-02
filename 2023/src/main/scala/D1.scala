@@ -1,9 +1,6 @@
 import lib.Support
 
-import scala.util.Try
-import scala.annotation.tailrec
-
-object `1` extends App with Support:
+object D1 extends App with Support:
   // lookahead to enable overlapping returns
   val numberRegex = """(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))""".r
   val testData =
