@@ -1,6 +1,6 @@
 import lib.Support
 
-object D2 extends App with Support:
+object d2 extends App with Support:
   val redR = """(\d+) red""".r
   val greenR = """(\d+) green""".r
   val blueR = """(\d+) blue""".r
