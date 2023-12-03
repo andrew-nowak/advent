@@ -1,6 +1,6 @@
 import lib.Support
 
-object d1 extends App with Support:
+object d1 extends App with Support {
   // lookahead to enable overlapping returns
   val numberRegex = """(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))""".r
   val testData =
@@ -31,16 +31,16 @@ object d1 extends App with Support:
         val nums = numberRegex
           .findAllMatchIn(line)
           .map(_.group(1) match {
-            case "one"   => 1
-            case "two"   => 2
+            case "one" => 1
+            case "two" => 2
             case "three" => 3
-            case "four"  => 4
-            case "five"  => 5
-            case "six"   => 6
+            case "four" => 4
+            case "five" => 5
+            case "six" => 6
             case "seven" => 7
             case "eight" => 8
-            case "nine"  => 9
-            case n       => n.toInt
+            case "nine" => 9
+            case n => n.toInt
           })
           .toList
 
@@ -57,3 +57,4 @@ object d1 extends App with Support:
   run(testData)
   println("--- real ---")
   run(input)
+}

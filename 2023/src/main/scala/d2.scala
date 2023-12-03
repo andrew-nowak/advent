@@ -1,6 +1,6 @@
 import lib.Support
 
-object d2 extends App with Support:
+object d2 extends App with Support {
   val redR = """(\d+) red""".r
   val greenR = """(\d+) green""".r
   val blueR = """(\d+) blue""".r
@@ -17,10 +17,10 @@ object d2 extends App with Support:
 
   def isvalid(show: String): Boolean = {
     (redR.findFirstMatchIn(show), greenR.findFirstMatchIn(show), blueR.findFirstMatchIn(show)) match {
-      case (Some(red), _, _) if red.group(1).toInt > 12     => false
+      case (Some(red), _, _) if red.group(1).toInt > 12 => false
       case (_, Some(green), _) if green.group(1).toInt > 13 => false
-      case (_, _, Some(blue)) if blue.group(1).toInt > 14   => false
-      case _                                                => true
+      case (_, _, Some(blue)) if blue.group(1).toInt > 14 => false
+      case _ => true
     }
   }
 
@@ -55,3 +55,4 @@ object d2 extends App with Support:
   run(testData)
   println("--- real ---")
   run(input)
+}
