@@ -2,7 +2,8 @@ import lib.Support
 
 object d1 extends App with Support {
   // lookahead to enable overlapping returns
-  val numberRegex = """(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))""".r
+  val numberRegex =
+    """(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))""".r
   val testData =
     """
       |two1nine

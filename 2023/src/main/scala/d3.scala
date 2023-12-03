@@ -2,7 +2,11 @@ import lib.{Coord, Support}
 
 object d3 extends App with Support {
   private final case class PartNumber(n: Long, part: Coord)
-  private final case class State(seen: List[PartNumber] = Nil, current: String = "", part: Option[Coord] = None)
+  private final case class State(
+      seen: List[PartNumber] = Nil,
+      current: String = "",
+      part: Option[Coord] = None
+  )
 
   val testData =
     """467..114..
@@ -36,12 +40,22 @@ object d3 extends App with Support {
       val State(rowNumbers, maybeFinalNo, valid) = row.zipWithIndex
         .map { case (c, x) => (Coord(x, y), c) }
         .foldLeft(State()) { case (State(seen, acc, validLoc), (loc, c)) =>
-          if (c.isDigit) State(seen, acc + c, validLoc orElse partLocs.intersect(loc.neighbours.toSet).headOption)
-          else if (acc.nonEmpty && validLoc.isDefined) State(seen :+ PartNumber(acc.toLong, validLoc.get), "", None)
+          if (c.isDigit)
+            State(
+              seen,
+              acc + c,
+              validLoc orElse partLocs
+                .intersect(loc.neighbours.toSet)
+                .headOption
+            )
+          else if (acc.nonEmpty && validLoc.isDefined)
+            State(seen :+ PartNumber(acc.toLong, validLoc.get), "", None)
           else State(seen, "", None)
         }
       val allRowNumbers =
-        if (valid.isDefined) rowNumbers :+ PartNumber(maybeFinalNo.toLong, valid.get) else rowNumbers
+        if (valid.isDefined)
+          rowNumbers :+ PartNumber(maybeFinalNo.toLong, valid.get)
+        else rowNumbers
       allRowNumbers
     }
 
@@ -49,7 +63,11 @@ object d3 extends App with Support {
 
     lazy val p1 = numbers.map(_.n).sum
 
-    lazy val p2 = gearLocs.toList.map(loc => numbersByPart(loc)).filter(_.size == 2).map(_.product).sum
+    lazy val p2 = gearLocs.toList
+      .map(loc => numbersByPart(loc))
+      .filter(_.size == 2)
+      .map(_.product)
+      .sum
 
     println(p1)
 
