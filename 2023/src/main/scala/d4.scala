@@ -8,6 +8,8 @@ object d4 extends App with Support {
       part: Option[Coord] = None
   )
 
+  val cardR = """Card +(\d+): ([0-9 ]+) \| ([0-9 ]+)""".r
+
   val testData =
     """Card   1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
       |Card   2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
@@ -23,17 +25,38 @@ object d4 extends App with Support {
   def run(data: String): Unit = {
     val in = stringSeq(data)
 
-    val cards = in.map { _card =>
-      val card = _card.drop(10).split("\\|")
-      val Array(winners, numbers) =
-        card.map(_.split(" ").flatMap(_.toIntOption))
+    lazy val p1 = {
+      val cards = in.map { _card =>
+        val card = _card.drop(10).split("\\|")
+        val Array(winners, numbers) =
+          card.map(_.split(" ").flatMap(_.toIntOption))
 
-      scores(winners.toSet.intersect(numbers.toSet).size)
+        scores(winners.toSet.intersect(numbers.toSet).size)
+      }
+      cards.sum
     }
 
-    lazy val p1 = cards.sum
+    lazy val p2 = {
+      val cards = in.map { case cardR(cardno, winnos, nos) =>
+        val card = cardno.toInt
+        val winners = winnos.split(" ").flatMap(_.toIntOption).toSet
+        val numbers = nos.split(" ").flatMap(_.toIntOption).toSet
+        (card, winners.intersect(numbers).size)
+      }
+      val initialCardCounts = cards.map(_._1 -> 1L).toMap
 
-    lazy val p2 = in.size
+      cards
+        .foldLeft(initialCardCounts)((cardCounts, card) => {
+          val (cardno, wins) = card
+          ((cardno + 1) to (cardno + wins)).foldLeft(cardCounts)((counts, n) =>
+            counts.updatedWith(n) { case Some(y) =>
+              Some(y + cardCounts(cardno))
+            }
+          )
+        })
+        .values
+        .sum
+    }
 
     println(p1)
 
