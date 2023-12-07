@@ -28,10 +28,12 @@ object d6 extends App with Support {
        * which is a quadratic...
        */
       val t = -time
-      val a = (-t + math.sqrt(t*t - 4 * dist)) / 2.0
-      val b = (-t - math.sqrt(t*t - 4 * dist)) / 2.0
+      val a = (-t + math.sqrt(t * t - 4 * dist)) / 2.0
+      val b = (-t - math.sqrt(t * t - 4 * dist)) / 2.0
 
-      val max = math.floor(math.max(a, b) - 0.00000001) // annoying but needed to cater for strict lt/gt
+      val max = math.floor(
+        math.max(a, b) - 0.00000001
+      ) // annoying but needed to cater for strict lt/gt
       val min = math.ceil(math.min(a, b) + 0.00000001)
       (max - min + 1).toLong
     }
