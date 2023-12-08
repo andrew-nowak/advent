@@ -78,6 +78,9 @@ trait Support {
   final def lcm(a: Long, b: Long): Long =
     (a / gcd(a, b)) * b
 
+  final def lcm(ls: Seq[Long]): Long =
+    ls.reduce(lcm)
+
   final def clamp(n: Long): Long = Math.min(1, Math.max(-1, n))
   final def clamp(n: Int): Int = Math.min(1, Math.max(-1, n))
 
