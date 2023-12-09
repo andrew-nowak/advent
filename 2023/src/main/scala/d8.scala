@@ -26,9 +26,8 @@ object d8 extends App with Support {
 
     val dirs: LazyList[Char] = LazyList.continually(in.head.toCharArray).flatten
 
-    val network: Map[String, (String, String)] = in
-      .collect { case networkR(location, l, r) => location -> (l -> r) }
-      .toMap
+    val network: Map[String, (String, String)] =
+      in.collect { case networkR(location, l, r) => location -> (l -> r) }.toMap
 
     @tailrec def findZZZ(dirs: LazyList[Char], loc: String, time: Int): Int = {
       if (loc == "ZZZ") time

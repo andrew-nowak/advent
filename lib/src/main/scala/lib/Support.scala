@@ -61,6 +61,13 @@ trait Support {
   def load2dIntSeqWithCoords(delimiterA: String = newline, delimiterB: String = " "): Map[Coord, Int] =
     `2dIntSeqWithCoords`(load, delimiterA, delimiterB)
 
+  def `2dLongSeq`(input: String, delimiterA: String = newline, delimiterB: String = " "): Seq[Seq[Long]] =
+    input
+      .split(delimiterA)
+      .filter(_ != "")
+      .map(_.split(delimiterB).map(_.toLong).toSeq)
+      .toIndexedSeq
+
   def charCoords(input: String, delimiter: String = newline): Map[Coord, Char] = {
     input
       .split(delimiter)
