@@ -91,7 +91,7 @@ trait Support {
   final def clamp(n: Long): Long = Math.min(1, Math.max(-1, n))
   final def clamp(n: Int): Int = Math.min(1, Math.max(-1, n))
 
-  def printCoords(s: Seq[Coord]) = {
+  def printCoords(s: Seq[Coord]): Unit = {
     val horiz = s.map(_.x)
     val left = horiz.min
     val right = horiz.max
@@ -109,7 +109,7 @@ trait Support {
     }
   }
 
-  def printCoords(m: Map[Coord, Int], printer: PartialFunction[Int, Char]) = {
+  def printCoords[T](m: Map[Coord, T], printer: PartialFunction[T, Char]): Unit = {
     val horiz = m.keys.map(_.x)
     val left = horiz.min
     val right = horiz.max
