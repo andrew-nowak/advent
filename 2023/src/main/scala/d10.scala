@@ -105,8 +105,9 @@ object d10 extends App with Support {
     lazy val p2Colouring = {
       // do p2 again with flooding for the fun of it
       // upscaling the map to provide halfway coordinates, then paint
-      val respaced = map.view.filterKeys(theLoop.contains).toMap.map {
-        case (coord, c) => Coord(coord.x * 2, coord.y * 2) -> c
+      val respaced = map.collect {
+        case (coord, c) if theLoop contains coord =>
+          Coord(coord.x * 2, coord.y * 2) -> c
       }
       // fill in the missing pipes
       val extras = respaced.flatMap {
