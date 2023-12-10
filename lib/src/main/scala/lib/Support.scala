@@ -109,6 +109,22 @@ trait Support {
     }
   }
 
+  def showCoords[T](m: Map[Coord, T], printer: PartialFunction[T, Char], default: Char = ' '): String = {
+    val horiz = m.keys.map(_.x)
+    val left = horiz.min
+    val right = horiz.max
+    val vert = m.keys.map(_.y)
+    val top = vert.min
+    val bot = vert.max
+
+    (for { y <- (top to bot) } yield {
+      val line = for { x <- left to right } yield {
+        m.get(Coord(x, y)).flatMap(printer.lift).getOrElse(default)
+      }
+      line.mkString
+    }).mkString("\n")
+  }
+
   def printCoords[T](m: Map[Coord, T], printer: PartialFunction[T, Char]): Unit = {
     val horiz = m.keys.map(_.x)
     val left = horiz.min
