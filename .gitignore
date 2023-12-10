@@ -4,3 +4,4 @@ input.txt
 .bloop
 advent-cookie-jar.txt
 target
+*.txt
