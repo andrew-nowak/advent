@@ -1,6 +1,5 @@
 import lib.{Coord, Support}
 
-import java.nio.file.{Files, Path}
 import scala.annotation.tailrec
 
 object d10 extends App with Support {
@@ -103,27 +102,76 @@ object d10 extends App with Support {
       })
     }
 
-    val dbgmap = map.filter(theLoop contains _._1) ++ p2.map(c => c -> 'X')
+    lazy val p2Colouring = {
+      // do p2 again with flooding for the fun of it
+      // upscaling the map to provide halfway coordinates, then paint
+      val respaced = map.view.filterKeys(theLoop.contains).toMap.map {
+        case (coord, c) => Coord(coord.x * 2, coord.y * 2) -> c
+      }
+      // fill in the missing pipes
+      val extras = respaced.flatMap {
+        case (coord, '|') => Seq(coord.north -> '|', coord.south -> '|')
+        case (coord, '-') => Seq(coord.west -> '-', coord.east -> '-')
+        case (coord, 'F') => Seq(coord.east -> '-', coord.south -> '|')
+        case (coord, 'L') => Seq(coord.east -> '-', coord.north -> '|')
+        case (coord, '7') => Seq(coord.west -> '-', coord.south -> '|')
+        case (coord, 'J') => Seq(coord.west -> '-', coord.north -> '|')
+        case _            => Seq.empty
+      }
 
-    val pretty = showCoords[Char](
-      dbgmap,
-      {
-        case '-' => '─'
-        case '|' => '│'
-        case 'F' => '┌'
-        case '7' => '┐'
-        case 'L' => '└'
-        case 'J' => '┘'
-        case 'X' => 'X'
-      },
-      default = '?'
-    )
+      val p2Map = extras ++ respaced
+      val max = Coord(p2Map.keys.map(_.x).max + 4, p2Map.keys.map(_.y).max + 4)
 
-    Files.writeString(Path.of("dbg.txt"), pretty)
+      // depth-first traversal, first painting from (0, 0) as 'O' for outside,
+      // then from all positions neighbouring the pipe as 'I' for inside (only painting if square is empty!)
+      @tailrec def paint(
+          map: Map[Coord, Char],
+          q: List[Coord],
+          as: Char
+      ): Map[Coord, Char] = q match {
+        case Nil => map
+        case head :: rest if !map.contains(head) =>
+          val next = head.cardinalNeighbours
+            .filter(!map.contains(_))
+            .filter(_.inBounds(max))
+          paint(map + (head -> as), rest ++ next, as)
+        case _ :: rest => paint(map, rest, as)
+      }
+      val externPainted = paint(p2Map, List(Coord(0, 0)), 'O')
+      val internPainted = paint(
+        externPainted,
+        respaced.keys.flatMap(_.cardinalNeighbours).toList,
+        'I'
+      )
+
+      // then go back to original co-ordinates without the midpoints
+      val downSpaced = internPainted.collect {
+        case (Coord(x, y), c) if x % 2 == 0 && y % 2 == 0 =>
+          Coord(x / 2, y / 2) -> c
+      }
+//      val pretty = showCoords[Char](
+//        downSpaced,
+//        {
+//          case '-' => '─'
+//          case '|' => '│'
+//          case 'F' => '┌'
+//          case '7' => '┐'
+//          case 'L' => '└'
+//          case 'J' => '┘'
+//          case c => c
+//        },
+//        default = ' '
+//      )
+
+//      println(pretty)
+      downSpaced.values.count(_ == 'I')
+    }
 
     println(p1)
 
     println(p2.size)
+
+    println(p2Colouring)
 
     val end = System.nanoTime()
     println(s"Done in ${(end - startTime).toDouble / 1_000_000} ms")
