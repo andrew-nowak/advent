@@ -28,8 +28,8 @@ object d6 extends App with Support {
        * which is a quadratic...
        */
       val t = -time
-      val a = (-t + math.sqrt(t * t - 4 * dist)) / 2.0
-      val b = (-t - math.sqrt(t * t - 4 * dist)) / 2.0
+      val a = (-t + math.sqrt((t * t - 4 * dist).toDouble) / 2.0)
+      val b = (-t - math.sqrt((t * t - 4 * dist).toDouble) / 2.0)
 
       val max = math.floor(
         math.max(a, b) - 0.00000001
