@@ -17,6 +17,13 @@ trait Support {
   def loadStringSeq(delimiter: String): Seq[String] =
     stringSeq(load, delimiter)
 
+  def stringSeqs(
+      input: String,
+      delimiterA: String = newline + newline,
+      delimiterB: String = newline
+  ): Seq[Seq[String]] =
+    input.split(delimiterA).toSeq.map(_.split(delimiterB).toSeq)
+
   def stringSeq(input: String): Seq[String] = stringSeq(input, newline)
   def loadStringSeq: Seq[String] = stringSeq(load)
 

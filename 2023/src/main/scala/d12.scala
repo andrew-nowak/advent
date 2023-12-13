@@ -1,5 +1,8 @@
 import lib.Support
 
+import scala.annotation.tailrec
+import scala.collection.immutable.Queue
+
 object d12 extends App with Support {
   val testData =
     """
