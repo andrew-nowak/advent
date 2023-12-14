@@ -1,5 +1,7 @@
 import lib.{Coord, Support}
 
+import scala.annotation.tailrec
+
 object d14 extends App with Support {
   sealed trait Tile
   object Rock extends Tile
@@ -36,6 +38,34 @@ object d14 extends App with Support {
       .toMap
   }
 
+  def rot(maxX: Int)(z: Zone): Zone = z.map { case (c, t) => (c.ccw(maxX), t) }
+
+  def spin(z: Zone): Zone = {
+    val maxX = z.keySet.map(_.x).max
+    val rt = rot(maxX) _
+    val sn = send _
+    Function.chain(List(sn, rt, sn, rt, sn, rt, sn, rt)).apply(z)
+  }
+
+  @tailrec def spinN(z: Zone, times: Long, seen: Map[Zone, Long]): Int = {
+    seen.get(z) match {
+      case Some(value) =>
+        val period = times - value
+        val pos = 1_000_000_000L % period
+//        println(times, value, pos)
+//        println(seen.toSeq.sortBy(_._2).map(q => countLoad(q._1)))
+        countLoad(seen.find(_._2 == pos + value - 1).get._1)
+      case None => spinN(spin(z), times + 1L, seen + (z -> (times + 1L)))
+    }
+  }
+
+  def countLoad(z: Zone): Int = {
+    val maxY = z.keySet.map(_.y).max
+    z.collect { case (Coord(_, y), Rock) =>
+      maxY + 1 - y
+    }.sum
+  }
+
   def run(data: String): Unit = {
     val start = System.nanoTime()
 
@@ -46,22 +76,19 @@ object d14 extends App with Support {
 
     val tiltedNorth = send(in)
 
-    printCoords[Tile](
-      tiltedNorth,
-      {
-        case Rock  => 'O'
-        case Block => '#'
-      }
-    )
+//    printCoords[Tile](
+//      LazyList.iterate(in)(spin).apply(2),
+//      {
+//        case Rock  => 'O'
+//        case Block => '#'
+//      }
+//    )
 
-    val maxY = in.keySet.map(_.y).max
-    val loadNorth = tiltedNorth.collect { case (Coord(_, y), Rock) =>
-      maxY + 1 - y
-    }.sum
+    val loadNorth = countLoad(tiltedNorth)
 
     val p1 = loadNorth
 
-    val p2 = in.size
+    val p2 = spinN(in, 0L, Map.empty)
 
     println(p1)
 

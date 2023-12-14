@@ -63,6 +63,9 @@ case class Coord(x: Int, y: Int) {
   def inBounds: Boolean = x >= 0 && y >= 0
 
   def inBounds(max: Coord): Boolean = inBounds && x <= max.y && y <= max.y
+
+  def cw(maxY: Int): Coord = Coord(y, -x + maxY)
+  def ccw(maxX: Int): Coord = Coord(-y + maxX, x)
 }
 
 case class Coord3d(x: Int, y: Int, z: Int) {
