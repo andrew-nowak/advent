@@ -98,7 +98,7 @@ trait Support {
   final def clamp(n: Long): Long = Math.min(1, Math.max(-1, n))
   final def clamp(n: Int): Int = Math.min(1, Math.max(-1, n))
 
-  def printCoords(s: Seq[Coord]): Unit = {
+  def printCoords(s: Iterable[Coord]): Unit = {
     val horiz = s.map(_.x)
     val left = horiz.min
     val right = horiz.max
@@ -108,7 +108,7 @@ trait Support {
 
     val cs = s.toSet
 
-    for { y <- (top to bot).reverse } {
+    for { y <- (top to bot) } {
       val line = for { x <- left to right } yield {
         if (cs.contains(Coord(x, y))) '█' else ' '
       }

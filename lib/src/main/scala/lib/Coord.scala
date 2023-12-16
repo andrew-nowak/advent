@@ -66,6 +66,13 @@ case class Coord(x: Int, y: Int) {
 
   def cw(maxY: Int): Coord = Coord(y, -x + maxY)
   def ccw(maxX: Int): Coord = Coord(-y + maxX, x)
+
+  def go(dir: Direction): Coord = dir match {
+    case Direction.Up    => up
+    case Direction.Down  => down
+    case Direction.Left  => left
+    case Direction.Right => right
+  }
 }
 
 case class Coord3d(x: Int, y: Int, z: Int) {
