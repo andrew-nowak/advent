@@ -3,24 +3,30 @@ package lib
 sealed trait Direction {
   def cw: Direction
   def ccw: Direction
+  def rev: Direction
 }
 case object Direction {
   case object Up extends Direction {
     def cw = Right
     def ccw = Left
+    def rev = Down
   }
   case object Down extends Direction {
     def cw = Left
     def ccw = Right
+    def rev = Up
   }
   case object Left extends Direction {
     def cw = Up
     def ccw = Down
+    def rev = Right
   }
   case object Right extends Direction {
     def cw = Down
     def ccw = Up
+    def rev = Left
   }
+  lazy val all: Set[Direction] = Set(Up, Down, Left, Right)
 }
 
 case class Coord(x: Int, y: Int) {
