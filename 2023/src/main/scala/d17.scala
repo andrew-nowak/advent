@@ -2,6 +2,7 @@ import lib.Direction.{Down, Right}
 import lib.{Coord, Direction, Support}
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 object d17 extends App with Support {
   val testData =
@@ -28,71 +29,66 @@ object d17 extends App with Support {
       heatLoss: Int
   ) {
     val visit: (Coord, Direction, Int) = (pos, dir, times)
+    def priority(dest: Coord) = heatLoss + pos.manhattan(dest)
   }
 
   @tailrec def astarStandard(
-      q: List[State],
+      q: mutable.PriorityQueue[State],
       m: Map[Coord, Int],
       dest: Coord,
       visited: Set[(Coord, Direction, Int)]
   ): Int = {
-    q match {
-      case Nil                           => -1
-      case head :: _ if head.pos == dest => head.heatLoss
-      case head :: rest if visited contains head.visit =>
-        astarStandard(rest, m, dest, visited)
-      case s :: rest =>
-        val nextDs =
-          Direction.all - s.dir.rev diff (if (s.times == 3) Set(s.dir)
-                                          else Set.empty)
-        val newStates = nextDs.toSeq.map(d => d -> s.pos.go(d)).collect {
-          case (d, pos) if pos.inBounds(dest) =>
-            State(
-              pos,
-              d,
-              if (d == s.dir) s.times + 1 else 1,
-              s.heatLoss + m(pos)
-            )
-        }
+    val head = q.dequeue()
+    if (head.pos == dest) head.heatLoss
+    else if (visited contains head.visit) astarStandard(q, m, dest, visited)
+    else {
+      val nextDs =
+        Direction.all - head.dir.rev diff (if (head.times == 3) Set(head.dir)
+                                           else Set.empty)
+      val newStates = nextDs.toSeq.map(d => d -> head.pos.go(d)).collect {
+        case (d, pos) if pos.inBounds(dest) =>
+          State(
+            pos = pos,
+            dir = d,
+            times = if (d == head.dir) head.times + 1 else 1,
+            heatLoss = head.heatLoss + m(pos)
+          )
+      }
 
-        val nq =
-          (rest ++ newStates).sortBy(s => s.pos.manhattan(dest) + s.heatLoss)
+      q.enqueue(newStates: _*)
 
-        astarStandard(nq, m, dest, visited + s.visit)
+      astarStandard(q, m, dest, visited + head.visit)
     }
   }
 
   @tailrec def astarUltra(
-      q: List[State],
+      q: mutable.PriorityQueue[State],
       m: Map[Coord, Int],
       dest: Coord,
       visited: Set[(Coord, Direction, Int)]
   ): Int = {
-    q match {
-      case Nil                                              => -1
-      case head :: _ if head.pos == dest && head.times >= 4 => head.heatLoss
-      case head :: rest if visited contains head.visit =>
-        astarUltra(rest, m, dest, visited)
-      case s :: rest =>
-        val nextDs =
-          if (s.times < 4) Set(s.dir)
-          else
-            Direction.all - s.dir.rev diff (if (s.times == 10) Set(s.dir)
-                                            else Set.empty)
-        val newStates = nextDs.toSeq.map(d => d -> s.pos.go(d)).collect {
-          case (d, pos) if pos.inBounds(dest) =>
-            State(
-              pos,
-              d,
-              if (d == s.dir) s.times + 1 else 1,
-              s.heatLoss + m(pos)
-            )
-        }
+    val head = q.dequeue()
+    if (head.pos == dest && head.times >= 4) head.heatLoss
+    else if (visited contains head.visit) astarUltra(q, m, dest, visited)
+    else {
+      val nextDs =
+        if (head.times < 4) Set(head.dir)
+        else
+          Direction.all - head.dir.rev diff (if (head.times == 10) Set(head.dir)
+                                             else Set.empty)
+      val newStates = nextDs.toSeq.map(d => d -> head.pos.go(d)).collect {
+        case (d, pos) if pos.inBounds(dest) =>
+          State(
+            pos = pos,
+            dir = d,
+            times = if (d == head.dir) head.times + 1 else 1,
+            heatLoss = head.heatLoss + m(pos)
+          )
+      }
 
-        val nq =
-          (rest ++ newStates).sortBy(s => s.pos.manhattan(dest) + s.heatLoss)
+      q.enqueue(newStates: _*)
 
-        astarUltra(nq, m, dest, visited + s.visit)
+      astarUltra(q, m, dest, visited + head.visit)
     }
   }
 
@@ -105,11 +101,16 @@ object d17 extends App with Support {
     val maxY = in.map(_._1.y).max
     val dest = Coord(maxX, maxY)
 
-    val initialStates = List(Down, Right).map(d => State(Coord(0, 0), d, 1, 0))
-    val p1 = astarStandard(initialStates, in, dest, Set.empty)
+    val initialStates = List(Down, Right).map(d =>
+      State(pos = Coord(0, 0), dir = d, times = 1, heatLoss = 0)
+    )
+    val pq = mutable.PriorityQueue.from(initialStates) { (x: State, y: State) =>
+      -(x.priority(dest) compare y.priority(dest))
+    }
+    val p1 = astarStandard(pq.clone(), in, dest, Set.empty)
     println(p1)
 
-    val p2 = astarUltra(initialStates, in, dest, Set.empty)
+    val p2 = astarUltra(pq.clone(), in, dest, Set.empty)
     println(p2)
 
     val end = System.nanoTime()
