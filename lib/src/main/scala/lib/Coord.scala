@@ -81,6 +81,8 @@ case class Coord(x: Int, y: Int) {
   }
 }
 
+object Origin extends Coord(0, 0)
+
 case class Coord3d(x: Int, y: Int, z: Int) {
   def +(o: Coord3d): Coord3d = Coord3d(x + o.x, y + o.y, z + o.z)
 
