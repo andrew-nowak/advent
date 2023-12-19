@@ -53,23 +53,30 @@ object d18 extends App with Support {
   final case class State(tot: Long, depth: Int, openVertices: Seq[Int])
 
   def calc(insts: Seq[(Direction, Int)]): Long = insts
+    // build up list of vertices
     .scanLeft[Coord](Origin) { case (last, (d, n)) => last.go(d, n) }
+    // don't include origin twice (and tail is faster than dropRight(1))
     .tail
+    // group vertices into map of y-coord ("depth") -> list[x-coords]
     .groupMap(_.y)(_.x)
+    // but don't actually want a map because want to iterate in order
     .toList
     .sortBy(_._1)
     //      .map(x => { println(x); x })
+    // at each depth, group the x-coords into pairs
     .map { case (i, vertices) =>
       (
         i,
-        if (vertices.nonEmpty)
-          vertices.sorted
-            .grouped(2)
-            .map { case Seq(a, b) => (a, b) }
-            .toSeq
-        else Seq.empty
+        vertices.sorted
+          .grouped(2)
+          .map { case Seq(a, b) => (a, b) }
+          .toSeq
       )
     }
+    // the main part. at each depth, figure out which columns have been "open"
+    // since the last depth and multiply. then, figure out what tiles are
+    // inside the shape at _this specific_ depth (very fiddly!).
+    // then figure out which columns are open below this depth
     .foldLeft(State(0L, 0, Seq.empty)) {
       case (State(tot, lastDepth, openVertices), (depth, newVertices)) =>
         // add up the space since the last new vertices and here
@@ -80,9 +87,15 @@ object d18 extends App with Support {
           .toLong * math.max(0, depth - lastDepth - 1)
 
         //        println("depth" + depth)
+        // for each pair of vertices currently open, figure out what happens
+        // to the column at this depth. Might be closing (bottom of shape),
+        // changing (widening, narrowing) or keeping (no change).
+        // there's also opening (top of shape) but we can't spot that here.
         val pairs: Seq[VertexPairs] = openVertices
           .grouped(2)
           .flatMap { case Seq(a1, b1) =>
+            // if the x-coords match in the currently open column and the
+            // changing vertices at this depth, then we're "closing" the shape
             if (newVertices.contains((a1, b1))) Some(Closing(a1, b1))
             else {
               val ma2 = newVertices.collectFirst {
@@ -93,6 +106,7 @@ object d18 extends App with Support {
                 case (na, nb) if na == b1 => nb
                 case (na, nb) if nb == b1 => na
               }
+              // widening narrowing or not changing at all
               (ma2, mb2) match {
                 case (Some(a2), Some(b2)) => Some(Changing(a1, a2, b1, b2))
                 case (Some(a2), _)        => Some(Changing(a1, a2, b1, b1))
@@ -102,11 +116,14 @@ object d18 extends App with Support {
             }
           }
           .toSeq ++ newVertices.collect {
+          // if there's vertices at this depth but no open columns above, then
+          // this is an "opening" -- top of a section of shape
           case (a, b)
               if !openVertices.contains(a) && !openVertices.contains(b) =>
             Opening(a, b)
         }
-        /*
+        /* the tricky bit - figure out how many tiles are inside the shape at
+           THIS depth
           x--y a--b
           x-a---y-b
           x-a---b-y
@@ -121,6 +138,17 @@ object d18 extends App with Support {
           }
           .map(p => p._2 - p._1 + 1)
           .sum
+
+        // the other tricky part - what if two open columns merge!!
+        /*
+           ###   ###
+           # #   # #
+           # #   # #
+           # ##### # <- here
+           #       #
+           #########
+         */
+        // eliminations because you're "eliminating" a pair of "openVertices"
         val eliminations = pairs
           .sliding(2)
           .toSeq
