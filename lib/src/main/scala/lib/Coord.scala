@@ -37,10 +37,14 @@ case class Coord(x: Int, y: Int) {
     down
   )
 
-  def up: Coord = Coord(x, y - 1)
-  def down: Coord = Coord(x, y + 1)
-  def left: Coord = Coord(x - 1, y)
-  def right: Coord = Coord(x + 1, y)
+  def up(n: Int): Coord = Coord(x, y - n)
+  def up: Coord = up(1)
+  def down(n: Int): Coord = Coord(x, y + n)
+  def down: Coord = down(1)
+  def left(n: Int): Coord = Coord(x - n, y)
+  def left: Coord = left(1)
+  def right(n: Int): Coord = Coord(x + n, y)
+  def right: Coord = right(1)
 
   def north: Coord = up
   def south: Coord = down
@@ -78,6 +82,13 @@ case class Coord(x: Int, y: Int) {
     case Direction.Down  => down
     case Direction.Left  => left
     case Direction.Right => right
+  }
+
+  def go(dir: Direction, n: Int): Coord = dir match {
+    case Direction.Up    => up(n)
+    case Direction.Down  => down(n)
+    case Direction.Left  => left(n)
+    case Direction.Right => right(n)
   }
 }
 
