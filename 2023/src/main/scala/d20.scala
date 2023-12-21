@@ -85,7 +85,38 @@ object d20 extends App with Support {
             sim(nq, nm, buttons, highs + cHighs, lows + cLows)
           case None => sim(t, m, buttons, highs, lows)
         }
+    }
+  }
 
+  @tailrec def simp2(
+      q: Queue[(String, Boolean, String)],
+      m: Map[String, Module],
+      buttons: Int,
+      periods: Map[String, Int]
+  ): Seq[Int] = {
+    q.dequeueOption match {
+      case _ if periods.size == 4 => periods.values.toSeq
+      case None =>
+        val q =
+          Queue.from(m("broadcaster").dests.map((_, false, "broadcaster")))
+        simp2(q, m, buttons + 1, periods)
+      case Some(((mod, high, from), t)) =>
+        m.get(mod) match {
+          case Some(module) =>
+            val (updatedMod, nextActivations) = module.apply(high, from)
+            val nq = t.enqueueAll(nextActivations.map { case (nextMod, high) =>
+              (nextMod, high, mod)
+            })
+            val nm = m.updated(mod, updatedMod)
+            //            println(mod, if (high) "high" else "low", cHighs, cLows, nextActivations, highs, lows)
+            val np =
+              if (
+                nextActivations.contains(("zg", true)) && !periods.contains(mod)
+              ) periods + ((mod, buttons))
+              else periods
+            simp2(nq, nm, buttons, np)
+          case None => simp2(t, m, buttons, periods)
+        }
     }
   }
 
@@ -120,15 +151,17 @@ object d20 extends App with Support {
     val p1 = sim(Queue.empty, graph, 1000, 0L, 0L)
     println(p1)
 
-    val p2 = in.size
+    val p2 = simp2(Queue.empty, graph, 0, Map.empty)
+
     println(p2)
+    println(lcm(p2.map(_.toLong)))
 
     val end = System.nanoTime()
     println(s"Done in ${(end - start).toDouble / 1_000_000} ms")
   }
 
   println("--- testdata ---")
-  run(testData)
+//  run(testData)
   println("--- real ---")
   run(input)
 }
