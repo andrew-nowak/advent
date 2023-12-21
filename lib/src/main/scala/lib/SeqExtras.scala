@@ -21,5 +21,6 @@ object SeqExtras {
   implicit class SeqExtensions[T](s: Seq[T]) {
     def produce[U](z: U)(f: (U, T) => U): Seq[U] = SeqExtras.produce(s)(z)(f)
     def thread[U, V](z: U)(f: (T, U) => (V, U)): (Seq[V], U) = SeqExtras.thread(s)(z)(f)
+    def frequencies: Map[T, Int] = s.groupBy(identity).map { case (k, v) => (k, v.size) }
   }
 }
