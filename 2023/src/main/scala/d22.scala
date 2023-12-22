@@ -33,25 +33,20 @@ object d22 extends App with Support {
   final case class State(bs: Seq[Brick], cubes: Set[Coord3d])
   val ns = LazyList.from(1)
 
-  @tailrec def dislodge(cubes: Set[Coord3d], bricks: List[Brick], cache: Map[Brick, Seq[Brick]], falling: Seq[Brick]): Seq[Brick] = {
-    bricks match {
-      case Nil => falling
-      case h :: t if cache contains h =>
-        val hit = cache(h)
-        val nc = cubes.diff(h.cubes ++ hit.flatMap(_.cubes))
-        dislodge(nc, t.diff(hit), cache, falling ++ hit :+ h)
-      case h :: t if h.drop(1).cubes.intersect(cubes).isEmpty => // this brick falls
-        dislodge(cubes.diff(h.cubes), t, cache, falling :+ h)
-      case _ :: t => // this brick stays
-        dislodge(cubes, t, cache, falling)
-    }
+  @tailrec def dislodge(
+      upDag: Map[Brick, Seq[Brick]],
+      downDag: Map[Brick, Seq[Brick]],
+      bricks: Set[Brick],
+      droppedBricks: Set[Brick]
+  ): Set[Brick] = {
+    val allDropped = droppedBricks ++ bricks
+    val above = bricks.flatMap(brick => upDag.getOrElse(brick, Seq.empty))
+    val dropping =
+      above.filter(downDag.get(_).exists(_.forall(allDropped.contains)))
+    val newlyDropping = dropping diff allDropped
+    if (newlyDropping.isEmpty) allDropped
+    else dislodge(upDag, downDag, newlyDropping, allDropped)
   }
-
-//  def dislodge(bricks: Seq[Brick], brick: Brick): Int = {
-//    val without = bricks.filterNot(_ == brick)
-//    val remainingCubes = without.flatMap(_.cubes).toSet
-//    without.filter(_.min.z > brick.max.z).
-//  }
 
   def run(data: String): Unit = {
     val start = System.nanoTime()
@@ -90,9 +85,11 @@ object d22 extends App with Support {
     val p1 = dropped.filter { brick =>
       val roof = brick.max.z
       val nbors = bricksByRoof(roof)
-      val supports = bricksByFloor.getOrElse(roof + 1, Seq.empty).filter(
-        _.drop(1).cubes.intersect(brick.cubes).nonEmpty
-      )
+      val supports = bricksByFloor
+        .getOrElse(roof + 1, Seq.empty)
+        .filter(
+          _.drop(1).cubes.intersect(brick.cubes).nonEmpty
+        )
       supports.forall { supported =>
         val howManyNeighboursSupport = nbors.count { nbor =>
           supported.drop(1).cubes.intersect(nbor.cubes).nonEmpty
@@ -105,15 +102,24 @@ object d22 extends App with Support {
 
     val p2Cands = dropped.diff(p1)
 
-    val allCubes = bricks.flatMap(_.cubes).toSet
+    val upDag: Map[Brick, Seq[Brick]] = dropped.map { brick =>
+      brick -> dropped
+        .filterNot(_ == brick)
+        .filter(_.cubes.intersect(brick.drop(-1).cubes).nonEmpty)
+    }.toMap
+    val downDag: Map[Brick, Seq[Brick]] = dropped.map { brick =>
+      brick -> dropped
+        .filterNot(_ == brick)
+        .filter(_.cubes.intersect(brick.drop(1).cubes).nonEmpty)
+    }.toMap
 
-    val x = p2Cands.sortBy(_.max.z).reverse.foldLeft(Map.empty[Brick, Seq[Brick]])((acc, brick) => {
-      println(brick)
-      val falling = dislodge(allCubes.diff(brick.cubes), dropped.filter(b => b.min.z > brick.max.z).toList, acc, Seq.empty)
-      acc + ((brick, falling))
-    }).map(_._2.size).sum
+    println(upDag.find { case (a, b) => b contains a })
 
-    val p2 = x
+    val p2 = p2Cands
+      .map(cand => dislodge(upDag, downDag, Set(cand), Set.empty))
+      .map(_.size - 1)
+      .sum
+
     println(p2)
 
     val end = System.nanoTime()
