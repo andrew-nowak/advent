@@ -95,6 +95,7 @@ case class Coord(x: Int, y: Int) {
 object Origin extends Coord(0, 0)
 
 case class Coord3d(x: Int, y: Int, z: Int) {
+  def manhattan: Int = x.abs + y.abs + z.abs
   def +(o: Coord3d): Coord3d = Coord3d(x + o.x, y + o.y, z + o.z)
 
   def surrounding: Seq[Coord3d] = for {
@@ -111,4 +112,6 @@ case class Coord3d(x: Int, y: Int, z: Int) {
     Coord3d(x, y, z + 1),
     Coord3d(x, y, z - 1)
   )
+
+  override def toString: String = (x, y, z).toString()
 }
