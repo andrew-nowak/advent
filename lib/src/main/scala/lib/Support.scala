@@ -132,7 +132,7 @@ trait Support {
     }).mkString("\n")
   }
 
-  def printCoords[T](m: Map[Coord, T], printer: PartialFunction[T, Char]): Unit = {
+  def printCoords[T](m: Map[Coord, T], printer: PartialFunction[T, Char], default: Char = ' '): Unit = {
     val horiz = m.keys.map(_.x)
     val left = horiz.min
     val right = horiz.max
@@ -142,7 +142,7 @@ trait Support {
 
     for { y <- (top to bot) } {
       val line = for { x <- left to right } yield {
-        m.get(Coord(x, y)).flatMap(printer.lift).getOrElse(' ')
+        m.get(Coord(x, y)).flatMap(printer.lift).getOrElse(default)
       }
       println(line.mkString)
     }
