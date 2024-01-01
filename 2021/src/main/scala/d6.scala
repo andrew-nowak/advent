@@ -1,10 +1,8 @@
-package twentyone.six
-
 import lib.Support
 
 import scala.annotation.tailrec
 
-object TwentyoneSix extends App with Support {
+object d6 extends App with Support {
   @tailrec def simulate(fish: Map[Int, Long], remainingDays: Int): Long = {
     if (remainingDays <= 0)
       fish.values.sum

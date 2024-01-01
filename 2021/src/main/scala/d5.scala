@@ -1,10 +1,8 @@
-package twentyone.five
-
 import lib.Support
 
 final case class Coord(x: Int, y: Int)
 
-object TwentyoneFive extends App with Support {
+object d5 extends App with Support {
   val pat = "(\\d+),(\\d+) -> (\\d+),(\\d+)".r
   def parse(raw: Seq[String]): Seq[(Coord, Coord)] = raw map { case pat(ax, ay, bx, by) =>
     (Coord(ax.toInt, ay.toInt), Coord(bx.toInt, by.toInt))

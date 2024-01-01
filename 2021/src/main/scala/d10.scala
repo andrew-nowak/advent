@@ -1,10 +1,8 @@
-package twentyone.ten
-
 import lib.Support
 
 import scala.annotation.tailrec
 
-object TwentyoneTen extends App with Support {
+object d10 extends App with Support {
   @tailrec def traverse(stack: List[Char], remaining: List[Char]): Either[Char, List[Char]] = {
     remaining match {
       case Nil                                => Right(stack)

@@ -1,8 +1,6 @@
-package twentyone.seven
-
 import lib.Support
 
-object TwentyoneSeven extends App with Support {
+object d7 extends App with Support {
 
   def sigma(n: Int) = n * (n + 1) / 2
 

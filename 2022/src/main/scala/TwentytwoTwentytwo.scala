@@ -186,7 +186,7 @@ object TwentytwoTwentytwo extends App with Support {
 
     val start = Position(Coord(board.rows.head._1, 0), Direction.Right)
 
-    printCoords(
+    printCoords[Int](
       board.map.map(n => n._1 -> (if (n._1 == start.location) 2 else if (n._2) 1 else 0)),
       {
         case 2 => 'X'
@@ -197,7 +197,7 @@ object TwentytwoTwentytwo extends App with Support {
 
     val p1 = move(start, board, instructions.trim.toCharArray().toList)
 
-    printCoords(
+    printCoords[Int](
       board.map.map(n => n._1 -> (if (n._1 == p1.location) 2 else if (n._2) 1 else 0)),
       {
         case 2 => 'X'

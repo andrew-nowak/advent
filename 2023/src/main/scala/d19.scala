@@ -105,7 +105,7 @@ object d19 extends App with Support {
 
         name -> (if (rules.forall(_.dest == fallback))
                    Workflow(name, Seq.empty, fallback)
-                 else Workflow(name, rules, fallback))
+                 else Workflow(name, rules.toSeq, fallback))
     }.toMap
 
     val parts: Seq[Map[String, Int]] = partsRaw.tail.map(

@@ -1,12 +1,10 @@
-package twentyone.eleven
-
 import lib.{Coord, Support}
 
 import scala.annotation.tailrec
 
 final case class State(energies: Map[Coord, Int], flashes: Int = 0)
 
-object TwentyoneEleven extends App with Support {
+object d11 extends App with Support {
 
   @tailrec def countFlashes(hasFlashed: Set[Coord], energies: Map[Coord, Int]): (Map[Coord, Int], Int) = {
     val flashes = energies.filter(_._2 > 9).keys.toSet.diff(hasFlashed)

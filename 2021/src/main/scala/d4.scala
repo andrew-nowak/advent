@@ -1,10 +1,8 @@
-package twentyone.four
-
 import lib.Support
 
 import scala.annotation.tailrec
 
-object TwentyoneFour extends App with Support {
+object d4 extends App with Support {
   val i = loadStringSeq
 
   val numbers = i.head.split(",").map(_.toInt)

@@ -65,7 +65,7 @@ object NineteenFifteen extends App with Support {
   val initialToVisit = initialLocation.cardinalNeighbours.map(State(ic, initialLocation, _)).toList
 
   val (area, Some(target)) = explore(initialToVisit, initialArea, None)
-  printCoords(
+  printCoords[Int](
     area,
     {
       case 0 => '█'

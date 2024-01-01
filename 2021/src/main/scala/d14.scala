@@ -1,10 +1,8 @@
-package twentyone.fourteen
-
 import lib.Support
 
 import scala.annotation.tailrec
 
-object TwentyoneFourteen extends App with Support {
+object d14 extends App with Support {
   val i = loadStringSeq
 
   val template = i.head

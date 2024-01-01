@@ -1,8 +1,6 @@
-package twentyone.thirteen
-
 import lib.{Coord, Support}
 
-object TwentyoneThirteen extends App with Support {
+object d13 extends App with Support {
   def doFold(dots: Set[Coord], fold: String): Set[Coord] = {
     fold match {
       case s"fold along x=${dx}" =>

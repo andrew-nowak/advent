@@ -1,11 +1,9 @@
-package twentyone.seventeen
-
 import lib.Support
 
-final case class State(x: Int, dx: Int, y: Int, dy: Int) {
-  def iterate: State = State(x + dx, if (dx > 0) dx - 1 else 0, y + dy, dy - 1)
-}
-object TwentyoneSeventeen extends App with Support {
+object d17 extends App with Support {
+  final case class State(x: Int, dx: Int, y: Int, dy: Int) {
+    def iterate: State = State(x + dx, if (dx > 0) dx - 1 else 0, y + dy, dy - 1)
+  }
   val i = load
 
   val (minx, maxx, miny, maxy) = i match {

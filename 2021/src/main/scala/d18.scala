@@ -1,5 +1,3 @@
-package twentyone.eighteen
-
 import lib.Support
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -108,7 +106,7 @@ final case class Number(value: Int) extends SnailfishNumber {
       None
 }
 
-object TwentyoneEighteen extends App with Support {
+object d18 extends App with Support {
   import SnailfishNumber.reads
   val i = loadStringSeq
 

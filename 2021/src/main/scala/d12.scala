@@ -1,10 +1,8 @@
-package twentyone.twelve
-
 import lib.Support
 
 import scala.annotation.tailrec
 
-object TwentyoneTwelve extends App with Support {
+object d12 extends App with Support {
   val i = loadStringSeq.map(_.split("-")).map(sp => (sp.head, sp.last))
 
   val bidi = (i ++ i.map(_.swap)).groupBy(_._1).view.mapValues(_.map(_._2)).toMap

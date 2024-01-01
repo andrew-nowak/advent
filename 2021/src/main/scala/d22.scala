@@ -1,19 +1,16 @@
-package twentyone.twentytwo
-
 import lib.{Coord3d, Support}
 import java.lang.Math.{max, min}
 
-final case class Step(action: String, cubes: Set[Coord3d])
-final case class Cuboid(ax: Int, bx: Int, ay: Int, by: Int, az: Int, bz: Int) {
-  def intersection(o: Cuboid): Option[Cuboid] = {
-    val ns = Cuboid(max(ax, o.ax), min(bx, o.bx), max(ay, o.ay), min(by, o.by), max(az, o.az), min(bz, o.bz))
-    if (ns.ax > ns.bx || ns.ay > ns.by || ns.az > ns.bz) None else Some(ns)
+object d22 extends App with Support {
+  final case class Step(action: String, cubes: Set[Coord3d])
+  final case class Cuboid(ax: Int, bx: Int, ay: Int, by: Int, az: Int, bz: Int) {
+    def intersection(o: Cuboid): Option[Cuboid] = {
+      val ns = Cuboid(max(ax, o.ax), min(bx, o.bx), max(ay, o.ay), min(by, o.by), max(az, o.az), min(bz, o.bz))
+      if (ns.ax > ns.bx || ns.ay > ns.by || ns.az > ns.bz) None else Some(ns)
+    }
+
+    def volume: Long = (bx - ax + 1).toLong * (by - ay + 1).toLong * (bz - az + 1).toLong
   }
-
-  def volume: Long = (bx - ax + 1).toLong * (by - ay + 1).toLong * (bz - az + 1).toLong
-}
-
-object TwentyoneTwentytwo extends App with Support {
   val i = loadStringSeq
 
   def getCubes(minx: Int, maxx: Int, miny: Int, maxy: Int, minz: Int, maxz: Int): Seq[Coord3d] = {

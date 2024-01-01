@@ -1,10 +1,8 @@
-package twentyone.nine
-
 import lib.{Coord, Support}
 
 import scala.annotation.tailrec
 
-object TwentyoneNine extends App with Support {
+object d9 extends App with Support {
   val i = load2dIntSeq(delimiterB = "")
 
   val heightmap = (for {

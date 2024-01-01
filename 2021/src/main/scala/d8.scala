@@ -1,8 +1,6 @@
-package twentyone.eight
-
 import lib.Support
 
-object TwentyoneEight extends App with Support {
+object d8 extends App with Support {
   val numbers =
     """
       |abcefg

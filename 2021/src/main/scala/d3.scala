@@ -1,10 +1,8 @@
-package twentyone.three
-
 import lib.Support
 
 import scala.annotation.tailrec
 
-object TwentyoneThree extends App with Support {
+object d3 extends App with Support {
   val i = loadStringSeq
 
   val allMostCommon = i.transpose

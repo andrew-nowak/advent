@@ -136,7 +136,7 @@ object d20 extends App with Support {
       .groupMap(_._2)(_._1)
     val graph: Map[String, Module] = in.map { mod =>
       val Array(modId, dests_) = mod.split(" -> ")
-      val dests = dests_.split(", ")
+      val dests = dests_.split(", ").toSeq
       if (modId startsWith "%")
         modId.tail -> Flipflop(on = false, dests = dests)
       else if (modId startsWith "&")

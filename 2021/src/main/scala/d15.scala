@@ -1,5 +1,3 @@
-package twentyone.fifteen
-
 import lib.{Coord, Support}
 
 import scala.annotation.tailrec
@@ -13,7 +11,7 @@ object Path {
   }
 }
 
-object TwentyoneFifteen extends App with Support {
+object d15 extends App with Support {
   @tailrec
   def findPath(q: mutable.PriorityQueue[Path], map: Map[Coord, Int], target: Coord, seen: Set[Coord]): Int = {
     val head = q.dequeue()

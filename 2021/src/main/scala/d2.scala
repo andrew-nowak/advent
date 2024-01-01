@@ -1,27 +1,24 @@
-package twentyone.two
-
 import lib.Support
 
-final case class Position(y: Int, x: Int) {
-  def product: Int = y * x
+object d2 extends App with Support {
+  final case class Position(y: Int, x: Int) {
+    def product: Int = y * x
 
-  def forward(dist: Int): Position = copy(x = x + dist)
-  def up(dist: Int): Position = copy(y = y - dist)
-  def down(dist: Int): Position = copy(y = y + dist)
-}
+    def forward(dist: Int): Position = copy(x = x + dist)
+    def up(dist: Int): Position = copy(y = y - dist)
+    def down(dist: Int): Position = copy(y = y + dist)
+  }
 
-final case class AimedPosition(y: Int, x: Int, aim: Int) {
-  def product: Int = y * x
+  final case class AimedPosition(y: Int, x: Int, aim: Int) {
+    def product: Int = y * x
 
-  def forward(dist: Int): AimedPosition = copy(
-    y = y + dist * aim,
-    x = x + dist
-  )
-  def up(by: Int): AimedPosition = copy(aim = aim - by)
-  def down(by: Int): AimedPosition = copy(aim = aim + by)
-}
-
-object TwentyoneTwo extends App with Support {
+    def forward(dist: Int): AimedPosition = copy(
+      y = y + dist * aim,
+      x = x + dist
+    )
+    def up(by: Int): AimedPosition = copy(aim = aim - by)
+    def down(by: Int): AimedPosition = copy(aim = aim + by)
+  }
   val i = loadStringSeq
   val instructionPattern = "(forward|down|up) (-?\\d+)".r
 
